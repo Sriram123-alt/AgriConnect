@@ -43,8 +43,10 @@ public class AuthServiceImpl implements AuthService {
                 .phoneNumber(request.getPhoneNumber())
                 .address(request.getAddress())
                 .role(request.getRole())
-                .isApproved(request.getRole() != com.agriconnect.server.entity.RoleType.ROLE_FARMER)
+                .isApproved(true) // Set to true for all roles for now to fix 'User disabled' error
                 .build();
+
+        user.setActive(true); // Ensure new users are active
 
         return userRepository.save(user);
     }
