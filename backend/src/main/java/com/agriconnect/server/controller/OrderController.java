@@ -42,10 +42,11 @@ public class OrderController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<OrderDTO>> updatePaymentStatus(
             @PathVariable Long id,
+            @RequestParam(required = false) Order.PaymentStatus paymentStatus,
             @RequestParam(required = false) Order.PaymentStatus farmerPayment,
             @RequestParam(required = false) Order.PaymentStatus transportPayment,
             Authentication authentication) {
-        OrderDTO result = orderService.updatePaymentStatus(id, farmerPayment, transportPayment,
+        OrderDTO result = orderService.updatePaymentStatus(id, paymentStatus, farmerPayment, transportPayment,
                 authentication.getName());
         return ResponseEntity.ok(ApiResponse.success(result, "Payment status updated!"));
     }

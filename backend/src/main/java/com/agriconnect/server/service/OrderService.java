@@ -10,7 +10,8 @@ public interface OrderService {
 
     OrderDTO updateOrderStatus(Long id, Order.OrderStatus status, String email);
 
-    OrderDTO updatePaymentStatus(Long id, Order.PaymentStatus farmerPayment, Order.PaymentStatus transportPayment,
+    OrderDTO updatePaymentStatus(Long id, Order.PaymentStatus paymentStatus, Order.PaymentStatus farmerPayment,
+            Order.PaymentStatus transportPayment,
             String email);
 
     OrderDTO getOrderById(Long id, String email);
@@ -20,4 +21,4 @@ public interface OrderService {
     Page<OrderDTO> getFarmerOrders(String email, Pageable pageable);
 
     Page<OrderDTO> getAllOrders(Pageable pageable); // For Admin
-}
+}```

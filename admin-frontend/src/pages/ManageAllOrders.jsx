@@ -26,14 +26,20 @@ const ManageAllOrders = () => {
         }
     };
 
-    const updatePayment = async (id, farmerPayment, transportPayment) => {
+    const updatePayment = async (id, paymentStatus, farmerPayment, transportPayment) => {
         try {
             const params = new URLSearchParams();
+            if (paymentStatus) params.append('paymentStatus', paymentStatus);
             if (farmerPayment) params.append('farmerPayment', farmerPayment);
             if (transportPayment) params.append('transportPayment', transportPayment);
             const res = await api.patch(`/api/orders/${id}/payment-status?${params.toString()}`);
             if (res.data.success) {
-                setOrders(orders.map(o => o.id === id ? { ...o, farmerPaymentStatus: res.data.data.farmerPaymentStatus, transportPaymentStatus: res.data.data.transportPaymentStatus } : o));
+                setOrders(orders.map(o => o.id === id ? {
+                    ...o,
+                    paymentStatus: res.data.data.paymentStatus,
+                    farmerPaymentStatus: res.data.data.farmerPaymentStatus,
+                    transportPaymentStatus: res.data.data.transportPaymentStatus
+                } : o));
             }
         } catch (err) {
             alert('Failed to update payment status');
@@ -144,11 +150,19 @@ const ManageAllOrders = () => {
                                                 Order: {order.status}
                                             </span>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                <span style={{ fontSize: '11px', fontWeight: '700', padding: '4px 10px', borderRadius: '100px', background: order.paymentStatus === 'PAID' ? '#dcfce7' : '#fef3c7', color: order.paymentStatus === 'PAID' ? '#15803d' : '#92400e' }}>
+                                                    Buyer: {order.paymentStatus}
+                                                </span>
+                                                {order.paymentStatus !== 'PAID' && (
+                                                    <button onClick={() => updatePayment(order.id, 'PAID', null, null)} style={{ fontSize: '10px', background: '#e2e8f0', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}>Mark Paid</button>
+                                                )}
+                                            </div>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                                 <span style={{ fontSize: '11px', fontWeight: '700', padding: '4px 10px', borderRadius: '100px', background: order.farmerPaymentStatus === 'PAID' ? '#dcfce7' : '#f1f5f9', color: order.farmerPaymentStatus === 'PAID' ? '#15803d' : '#475569' }}>
                                                     Farmer: {order.farmerPaymentStatus}
                                                 </span>
                                                 {order.farmerPaymentStatus !== 'PAID' && (
-                                                    <button onClick={() => updatePayment(order.id, 'PAID', null)} style={{ fontSize: '10px', background: '#e2e8f0', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}>Mark Paid</button>
+                                                    <button onClick={() => updatePayment(order.id, null, 'PAID', null)} style={{ fontSize: '10px', background: '#e2e8f0', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}>Mark Paid</button>
                                                 )}
                                             </div>
                                             {order.hasTransport && (
@@ -157,7 +171,7 @@ const ManageAllOrders = () => {
                                                         Transport: {order.transportPaymentStatus}
                                                     </span>
                                                     {order.transportPaymentStatus !== 'PAID' && (
-                                                        <button onClick={() => updatePayment(order.id, null, 'PAID')} style={{ fontSize: '10px', background: '#e2e8f0', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}>Mark Paid</button>
+                                                        <button onClick={() => updatePayment(order.id, null, null, 'PAID')} style={{ fontSize: '10px', background: '#e2e8f0', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}>Mark Paid</button>
                                                     )}
                                                 </div>
                                             )}

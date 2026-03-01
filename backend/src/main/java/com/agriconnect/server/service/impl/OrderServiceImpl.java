@@ -166,8 +166,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderDTO updatePaymentStatus(Long id, Order.PaymentStatus farmerPayment,
-            Order.PaymentStatus transportPayment, String email) {
+    public OrderDTO updatePaymentStatus(Long id, Order.PaymentStatus paymentStatus,
+            Order.PaymentStatus farmerPayment, Order.PaymentStatus transportPayment, String email) {
         Order order = orderRepository.findById(id).orElseThrow();
         User user = userRepository.findByEmail(email).orElseThrow();
 
@@ -175,6 +175,17 @@ public class OrderServiceImpl implements OrderService {
             throw new RuntimeException("Unauthorized");
         }
 
+        if (paymentStatus != null) {
+            order.setPaymentStatus(paymentStatus);
+            // Notify buyer about their payment status update
+            notificationService.createNotification(
+                    order.getBuyer(),
+                    "Payment Status Updated",
+                    String.format("The payment status for your order #%d has been updated to %s.", order.getId(),
+                            paymentStatus),
+                    "ORDER",
+                    "/orders");
+        }
         if (farmerPayment != null) {
             order.setFarmerPaymentStatus(farmerPayment);
         }
