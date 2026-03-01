@@ -62,6 +62,8 @@ const ManageAllOrders = () => {
         }
     };
 
+    const [selectedOrder, setSelectedOrder] = useState(null);
+
     return (
         <div style={{ display: 'flex', background: '#f1f5f9', minHeight: '100vh' }}>
             <AdminNavbar />
@@ -136,34 +138,37 @@ const ManageAllOrders = () => {
                                         <p style={{ fontWeight: '800', fontSize: '15px' }}>₹{(order.totalAmount || 0).toFixed(2)}</p>
                                         <p style={{ fontSize: '11px', color: '#15803d', fontWeight: '700' }}>Fee: ₹{((order.totalAmount || 0) * 0.05).toFixed(2)}</p>
                                     </td>
-                                    <td style={{ padding: '16px 24px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                                        <span style={{ fontSize: '11px', fontWeight: '700', padding: '4px 10px', borderRadius: '100px', width: 'fit-content', ...getStatusStyle(order.status) }}>
-                                            Order: {order.status}
-                                        </span>
-                                        <span style={{ fontSize: '11px', fontWeight: '700', padding: '4px 10px', borderRadius: '100px', width: 'fit-content', background: order.paymentStatus === 'PAID' ? '#dcfce7' : '#fef3c7', color: order.paymentStatus === 'PAID' ? '#15803d' : '#92400e' }}>
-                                            Buyer Pay: {order.paymentMethod} • {order.paymentStatus}
-                                        </span>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                            <span style={{ fontSize: '11px', fontWeight: '700', padding: '4px 10px', borderRadius: '100px', background: order.farmerPaymentStatus === 'PAID' ? '#dcfce7' : '#f1f5f9', color: order.farmerPaymentStatus === 'PAID' ? '#15803d' : '#475569' }}>
-                                                Farmer: {order.farmerPaymentStatus}
+                                    <td style={{ padding: '16px 24px' }}>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                            <span style={{ fontSize: '11px', fontWeight: '700', padding: '4px 10px', borderRadius: '100px', width: 'fit-content', ...getStatusStyle(order.status) }}>
+                                                Order: {order.status}
                                             </span>
-                                            {order.farmerPaymentStatus !== 'PAID' && (
-                                                <button onClick={() => updatePayment(order.id, 'PAID', null)} style={{ fontSize: '10px', background: '#e2e8f0', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}>Mark Paid</button>
-                                            )}
-                                        </div>
-                                        {order.hasTransport && (
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                <span style={{ fontSize: '11px', fontWeight: '700', padding: '4px 10px', borderRadius: '100px', background: order.transportPaymentStatus === 'PAID' ? '#dcfce7' : '#f1f5f9', color: order.transportPaymentStatus === 'PAID' ? '#15803d' : '#475569' }}>
-                                                    Transport: {order.transportPaymentStatus}
+                                                <span style={{ fontSize: '11px', fontWeight: '700', padding: '4px 10px', borderRadius: '100px', background: order.farmerPaymentStatus === 'PAID' ? '#dcfce7' : '#f1f5f9', color: order.farmerPaymentStatus === 'PAID' ? '#15803d' : '#475569' }}>
+                                                    Farmer: {order.farmerPaymentStatus}
                                                 </span>
-                                                {order.transportPaymentStatus !== 'PAID' && (
-                                                    <button onClick={() => updatePayment(order.id, null, 'PAID')} style={{ fontSize: '10px', background: '#e2e8f0', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}>Mark Paid</button>
+                                                {order.farmerPaymentStatus !== 'PAID' && (
+                                                    <button onClick={() => updatePayment(order.id, 'PAID', null)} style={{ fontSize: '10px', background: '#e2e8f0', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}>Mark Paid</button>
                                                 )}
                                             </div>
-                                        )}
+                                            {order.hasTransport && (
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                    <span style={{ fontSize: '11px', fontWeight: '700', padding: '4px 10px', borderRadius: '100px', background: order.transportPaymentStatus === 'PAID' ? '#dcfce7' : '#f1f5f9', color: order.transportPaymentStatus === 'PAID' ? '#15803d' : '#475569' }}>
+                                                        Transport: {order.transportPaymentStatus}
+                                                    </span>
+                                                    {order.transportPaymentStatus !== 'PAID' && (
+                                                        <button onClick={() => updatePayment(order.id, null, 'PAID')} style={{ fontSize: '10px', background: '#e2e8f0', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}>Mark Paid</button>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
                                     </td>
                                     <td style={{ padding: '16px 24px' }}>
-                                        <button className="btn" style={{ padding: '6px', background: 'white', border: '1px solid #e2e8f0' }}>
+                                        <button
+                                            onClick={() => setSelectedOrder(order)}
+                                            className="btn"
+                                            style={{ padding: '6px', background: 'white', border: '1px solid #e2e8f0', cursor: 'pointer' }}
+                                        >
                                             <ExternalLink size={16} color="#64748b" />
                                         </button>
                                     </td>
@@ -173,6 +178,59 @@ const ManageAllOrders = () => {
                     </table>
                 </div>
             </main>
+
+            {/* Order Detail Modal */}
+            {selectedOrder && (
+                <div style={{ position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(4px)' }}>
+                    <div style={{ background: 'white', width: '100%', maxWidth: '600px', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)' }}>
+                        <div style={{ padding: '24px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <h2 style={{ fontSize: '20px', fontWeight: '800' }}>Order Detail #{selectedOrder.id}</h2>
+                            <button onClick={() => setSelectedOrder(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8' }}>
+                                <XCircle size={24} />
+                            </button>
+                        </div>
+                        <div style={{ padding: '24px', maxHeight: '70vh', overflowY: 'auto' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '24px' }}>
+                                <div>
+                                    <p style={{ fontSize: '11px', color: '#64748b', fontWeight: '800', textTransform: 'uppercase', marginBottom: '4px' }}>Buyer Name</p>
+                                    <p style={{ fontWeight: '700' }}>{selectedOrder.buyerName}</p>
+                                </div>
+                                <div>
+                                    <p style={{ fontSize: '11px', color: '#64748b', fontWeight: '800', textTransform: 'uppercase', marginBottom: '4px' }}>Payment Method</p>
+                                    <p style={{ fontWeight: '700' }}>{selectedOrder.paymentMethod}</p>
+                                </div>
+                            </div>
+
+                            <div style={{ marginBottom: '24px' }}>
+                                <p style={{ fontSize: '11px', color: '#64748b', fontWeight: '800', textTransform: 'uppercase', marginBottom: '12px' }}>Order Items</p>
+                                {selectedOrder.items.map(item => (
+                                    <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px', background: '#f8fafc', borderRadius: '12px', marginBottom: '8px' }}>
+                                        <div>
+                                            <p style={{ fontWeight: '700', fontSize: '14px' }}>{item.cropName}</p>
+                                            <p style={{ fontSize: '12px', color: '#64748b' }}>by {item.farmerName}</p>
+                                        </div>
+                                        <div style={{ textAlign: 'right' }}>
+                                            <p style={{ fontWeight: '700', fontSize: '14px' }}>₹{(item.quantity * item.priceAtPurchase).toFixed(2)}</p>
+                                            <p style={{ fontSize: '12px', color: '#64748b' }}>{item.quantity}kg @ ₹{item.priceAtPurchase}/kg</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '16px' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                                    <span style={{ fontSize: '14px', color: '#64748b' }}>Subtotal</span>
+                                    <span style={{ fontSize: '14px', fontWeight: '700' }}>₹{(selectedOrder.totalAmount || 0).toFixed(2)}</span>
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #e2e8f0', paddingTop: '8px', marginTop: '8px' }}>
+                                    <span style={{ fontSize: '16px', fontWeight: '800' }}>Total</span>
+                                    <span style={{ fontSize: '16px', fontWeight: '800', color: '#10b981' }}>₹{(selectedOrder.totalAmount || 0).toFixed(2)}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
