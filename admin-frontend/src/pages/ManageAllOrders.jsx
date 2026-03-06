@@ -11,6 +11,11 @@ const ManageAllOrders = () => {
     useEffect(() => {
         fetchOrders();
         fetchStats();
+        const interval = setInterval(() => {
+            fetchOrders();
+            fetchStats();
+        }, 10000); // Poll every 10 seconds
+        return () => clearInterval(interval);
     }, []);
 
     const fetchOrders = async () => {

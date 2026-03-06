@@ -14,20 +14,23 @@ const AdminDashboard = () => {
     });
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const fetchMetrics = async () => {
-            try {
-                const response = await api.get('/api/admin/metrics');
-                if (response.data.success) {
-                    setMetrics(response.data.data);
-                }
-            } catch (err) {
-                console.error('Failed to fetch metrics', err);
-            } finally {
-                setLoading(false);
+    const fetchMetrics = async () => {
+        try {
+            const response = await api.get('/api/admin/metrics');
+            if (response.data.success) {
+                setMetrics(response.data.data);
             }
-        };
+        } catch (err) {
+            console.error('Failed to fetch metrics', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
         fetchMetrics();
+        const interval = setInterval(fetchMetrics, 10000); // Poll every 10 seconds
+        return () => clearInterval(interval);
     }, []);
 
     const stats = [

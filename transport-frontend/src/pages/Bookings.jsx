@@ -47,7 +47,11 @@ const Bookings = () => {
         }
     };
 
-    useEffect(() => { fetchBookings(); }, []);
+    useEffect(() => {
+        fetchBookings();
+        const interval = setInterval(fetchBookings, 10000); // Poll every 10 seconds
+        return () => clearInterval(interval);
+    }, []);
 
     const refresh = () => { setRefreshing(true); fetchBookings(); };
 

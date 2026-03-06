@@ -16,7 +16,7 @@ const Navbar = () => {
     React.useEffect(() => {
         if (user) {
             fetchUnreadCount();
-            const interval = setInterval(fetchUnreadCount, 30000);
+            const interval = setInterval(fetchUnreadCount, 10000); // Poll every 10s
             return () => clearInterval(interval);
         }
     }, [user]);

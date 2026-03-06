@@ -77,6 +77,8 @@ const ManageNegotiations = () => {
 
     useEffect(() => {
         fetchNegotiations();
+        const interval = setInterval(fetchNegotiations, 10000); // Poll every 10 seconds
+        return () => clearInterval(interval);
     }, []);
 
     const fetchNegotiations = async () => {

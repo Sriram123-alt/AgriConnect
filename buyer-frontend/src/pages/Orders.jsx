@@ -35,7 +35,11 @@ const Orders = () => {
     const location = useLocation();
     const { orderId } = useParams();
 
-    useEffect(() => { fetchOrders(); }, [orderId]);
+    useEffect(() => {
+        fetchOrders();
+        const interval = setInterval(fetchOrders, 10000); // Poll every 10s
+        return () => clearInterval(interval);
+    }, [orderId]);
 
     const fetchOrders = async () => {
         try {
