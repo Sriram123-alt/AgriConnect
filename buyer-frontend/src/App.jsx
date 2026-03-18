@@ -27,108 +27,35 @@ const PrivateRoute = ({ children }) => {
     return user ? children : <Navigate to="/login" />;
 };
 
+import MainLayout from './components/MainLayout';
+
+const PrivateLayout = ({ children }) => (
+    <PrivateRoute>
+        <MainLayout>{children}</MainLayout>
+    </PrivateRoute>
+);
+
 function App() {
     return (
         <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route
-                path="/marketplace"
-                element={
-                    <PrivateRoute>
-                        <Marketplace />
-                    </PrivateRoute>
-                }
-            />
-            <Route
-                path="/crop/:id"
-                element={
-                    <PrivateRoute>
-                        <CropDetails />
-                    </PrivateRoute>
-                }
-            />
-            <Route
-                path="/cart"
-                element={
-                    <PrivateRoute>
-                        <Cart />
-                    </PrivateRoute>
-                }
-            />
-            <Route
-                path="/orders"
-                element={
-                    <PrivateRoute>
-                        <Orders />
-                    </PrivateRoute>
-                }
-            />
-            <Route
-                path="/orders/:orderId"
-                element={
-                    <PrivateRoute>
-                        <Orders />
-                    </PrivateRoute>
-                }
-            />
-            <Route
-                path="/track/:orderId"
-                element={
-                    <PrivateRoute>
-                        <OrderTracking />
-                    </PrivateRoute>
-                }
-            />
-            <Route
-                path="/negotiations"
-                element={
-                    <PrivateRoute>
-                        <Negotiations />
-                    </PrivateRoute>
-                }
-            />
-            <Route
-                path="/negotiations/:id"
-                element={
-                    <PrivateRoute>
-                        <Negotiations />
-                    </PrivateRoute>
-                }
-            />
-            <Route
-                path="/transport"
-                element={
-                    <PrivateRoute>
-                        <MyTransport />
-                    </PrivateRoute>
-                }
-            />
-            <Route
-                path="/payments"
-                element={
-                    <PrivateRoute>
-                        <Payments />
-                    </PrivateRoute>
-                }
-            />
-            <Route
-                path="/messages"
-                element={
-                    <PrivateRoute>
-                        <Messages />
-                    </PrivateRoute>
-                }
-            />
-            <Route
-                path="/reviews"
-                element={
-                    <PrivateRoute>
-                        <Reviews />
-                    </PrivateRoute>
-                }
-            />
+
+            {/* Private Routes wrapped in MainLayout */}
+            <Route path="/marketplace" element={<PrivateLayout><Marketplace /></PrivateLayout>} />
+            <Route path="/crop/:id" element={<PrivateLayout><CropDetails /></PrivateLayout>} />
+            <Route path="/cart" element={<PrivateLayout><Cart /></PrivateLayout>} />
+            <Route path="/orders" element={<PrivateLayout><Orders /></PrivateLayout>} />
+            <Route path="/orders/:orderId" element={<PrivateLayout><Orders /></PrivateLayout>} />
+            <Route path="/track/:orderId" element={<PrivateLayout><OrderTracking /></PrivateLayout>} />
+            <Route path="/negotiations" element={<PrivateLayout><Negotiations /></PrivateLayout>} />
+            <Route path="/negotiations/:id" element={<PrivateLayout><Negotiations /></PrivateLayout>} />
+            <Route path="/transport" element={<PrivateLayout><MyTransport /></PrivateLayout>} />
+            <Route path="/payments" element={<PrivateLayout><Payments /></PrivateLayout>} />
+            <Route path="/messages" element={<PrivateLayout><Messages /></PrivateLayout>} />
+            <Route path="/reviews" element={<PrivateLayout><Reviews /></PrivateLayout>} />
+
             {/* Catch-all route to home if not found */}
             <Route path="*" element={<Navigate to="/" />} />
         </Routes>

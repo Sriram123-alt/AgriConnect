@@ -6,6 +6,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Bookings from './pages/Bookings';
 import Profile from './pages/Profile';
+import MainLayout from './components/MainLayout';
 
 const PrivateRoute = ({ children }) => {
     const { user, loading } = useAuth();
@@ -21,7 +22,7 @@ const PrivateRoute = ({ children }) => {
         </div>
     );
 
-    return user ? children : <Navigate to="/login" />;
+    return user ? <MainLayout>{children}</MainLayout> : <Navigate to="/login" />;
 };
 
 function App() {

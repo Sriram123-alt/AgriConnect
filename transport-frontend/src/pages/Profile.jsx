@@ -22,10 +22,8 @@ const Profile = () => {
     };
 
     return (
-        <>
-            
-            <div className="container" style={{ padding: '32px 24px', maxWidth: '1000px' }}>
-                <div style={{ marginBottom: '32px' }}>
+        <div className="animate-fade-in" style={{ maxWidth: '1000px', margin: '0 auto' }}>
+            <div style={{ marginBottom: '32px' }}>
                     <h1 style={{ fontSize: '28px', fontWeight: '800' }}>Account Profile</h1>
                     <p style={{ color: '#64748b', marginTop: '6px' }}>Manage your transport business identity and contact details</p>
                 </div>
@@ -159,8 +157,7 @@ const Profile = () => {
                         </div>
                     </div>
                 </div>
-            </div>
-        </>
+        </div>
     );
 };
 

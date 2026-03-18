@@ -122,24 +122,19 @@ const Bookings = () => {
 
     if (loading) {
         return (
-            <>
-                
-                <div style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <div className="animate-spin" style={{
-                        width: 44, height: 44,
-                        border: '4px solid rgba(249,115,22,0.2)',
-                        borderTopColor: '#f97316', borderRadius: '50%',
-                    }} />
-                </div>
-            </>
+            <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div className="animate-spin" style={{
+                    width: 44, height: 44,
+                    border: '4px solid rgba(249,115,22,0.2)',
+                    borderTopColor: '#f97316', borderRadius: '50%',
+                }} />
+            </div>
         );
     }
 
     return (
-        <>
-            
-            <div className="container" style={{ padding: '32px 24px' }}>
-                {/* Header */}
+        <div className="animate-fade-in">
+            {/* Header */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
                     <div>
                         <h1 style={{ fontSize: 28, fontWeight: 800 }}>All Bookings</h1>
@@ -559,8 +554,7 @@ const Bookings = () => {
                         })}
                     </div>
                 )}
-            </div>
-        </>
+        </div>
     );
 };
 
