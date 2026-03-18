@@ -16,6 +16,8 @@ const Marketplace = () => {
 
     useEffect(() => {
         fetchCrops();
+        const interval = setInterval(fetchCrops, 20000); // Refresh every 20 seconds
+        return () => clearInterval(interval);
     }, []);
 
     const fetchCrops = async () => {
@@ -31,10 +33,11 @@ const Marketplace = () => {
                     farmer: crop.farmerName || 'Unknown Farmer',
                     farmerEmail: crop.farmerEmail,
                     rating: crop.averageRating || 4.5,
-                    image: crop.imageUrls && crop.imageUrls.length > 0
+                    imageUrl: crop.imageUrls && crop.imageUrls.length > 0
                         ? crop.imageUrls[0]
                         : 'https://images.unsplash.com/photo-1488459716781-6918f33427e1?auto=format&fit=crop&q=80&w=400',
                     location: crop.location || 'Unknown Location',
+                    quantity: crop.quantity || 0,
                     pricePerKg: crop.pricePerKg // Added for cart context
                 }));
                 setCrops(cropsData);
@@ -63,9 +66,11 @@ const Marketplace = () => {
     };
 
     const filteredCrops = crops.filter(crop =>
-        crop.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        crop.farmer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        crop.location.toLowerCase().includes(searchTerm.toLowerCase())
+        (crop.quantity > 0) && (
+            crop.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            crop.farmer.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            crop.location.toLowerCase().includes(searchTerm.toLowerCase())
+        )
     );
 
     return (
@@ -121,7 +126,7 @@ const Marketplace = () => {
                             onClick={() => navigate(`/crop/${crop.id}`)}
                             style={{ height: '220px', width: '100%', position: 'relative', cursor: 'pointer' }}
                         >
-                            <img src={crop.image} alt={crop.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            <img src={crop.imageUrl} alt={crop.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                             <div style={{ position: 'absolute', top: '12px', right: '12px', background: 'rgba(255,255,255,0.95)', padding: '6px 10px', borderRadius: '100px', fontSize: '12px', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '4px', boxShadow: 'var(--shadow)' }}>
                                 <Star size={14} color="#f59e0b" fill="#f59e0b" /> {crop.rating.toFixed(1)}
                             </div>
@@ -136,9 +141,12 @@ const Marketplace = () => {
                                 </h3>
                                 <span style={{ fontSize: '20px', fontWeight: '800', color: 'var(--primary)' }}>₹{crop.price.toFixed(2)}<span style={{ fontSize: '14px', fontWeight: '500', color: 'var(--text-muted)' }}>/kg</span></span>
                             </div>
-                            <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                                 <MapPin size={14} /> {crop.farmer} • {crop.location}
                             </p>
+                            <div style={{ marginBottom: '16px', fontSize: '14px', fontWeight: '600', color: 'var(--primary-dark)' }}>
+                                Available: {crop.quantity} {crop.unit || 'kg'}
+                            </div>
                             <div style={{ display: 'flex', gap: '12px' }}>
                                 <button
                                     onClick={() => openNegotiation(crop)}

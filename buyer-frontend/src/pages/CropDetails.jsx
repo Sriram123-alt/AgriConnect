@@ -17,6 +17,8 @@ const CropDetails = () => {
 
     useEffect(() => {
         fetchCrop();
+        const interval = setInterval(fetchCrop, 10000); // Poll every 10s
+        return () => clearInterval(interval);
     }, [id]);
 
     const fetchCrop = async () => {
@@ -37,7 +39,8 @@ const CropDetails = () => {
             id: crop.id,
             name: crop.name,
             pricePerKg: crop.pricePerKg,
-            farmerName: crop.farmerName
+            farmerName: crop.farmerName,
+            imageUrl: images[0]
         }, quantity);
         alert(`Added ${quantity}kg of ${crop.name} to cart!`);
     };
@@ -182,14 +185,24 @@ const CropDetails = () => {
                             <button
                                 onClick={handleAddToCart}
                                 className="btn btn-primary"
-                                style={{ padding: '16px', fontSize: '16px', width: '100%' }}
+                                style={{ padding: '16px', fontSize: '16px', width: '100%', opacity: crop.quantity <= 0 ? 0.5 : 1 }}
+                                disabled={crop.quantity <= 0}
                             >
-                                <ShoppingCart size={20} /> Add to Cart
+                                <ShoppingCart size={20} /> {crop.quantity <= 0 ? 'Out of Stock' : 'Add to Cart'}
                             </button>
                             <button
                                 onClick={() => setIsNegotiating(true)}
                                 className="btn"
-                                style={{ padding: '16px', fontSize: '16px', width: '100%', border: '2px solid var(--primary)', background: 'white', color: 'var(--primary)' }}
+                                style={{ 
+                                    padding: '16px', 
+                                    fontSize: '16px', 
+                                    width: '100%', 
+                                    border: '2px solid var(--primary)', 
+                                    background: 'white', 
+                                    color: 'var(--primary)',
+                                    opacity: crop.quantity <= 0 ? 0.5 : 1
+                                }}
+                                disabled={crop.quantity <= 0}
                             >
                                 <MessageCircle size={20} /> Negotiate Price
                             </button>

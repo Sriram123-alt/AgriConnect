@@ -10,6 +10,8 @@ const MyCrops = () => {
 
     useEffect(() => {
         fetchMyCrops();
+        const interval = setInterval(fetchMyCrops, 15000); // Check inventory every 15s
+        return () => clearInterval(interval);
     }, []);
 
     const fetchMyCrops = async () => {

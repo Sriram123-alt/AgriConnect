@@ -8,6 +8,8 @@ const ManageAllCrops = () => {
 
     useEffect(() => {
         fetchCrops();
+        const interval = setInterval(fetchCrops, 20000); // Admin poll every 20s
+        return () => clearInterval(interval);
     }, []);
 
     const fetchCrops = async () => {
