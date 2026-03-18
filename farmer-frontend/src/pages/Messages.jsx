@@ -120,164 +120,162 @@ const Messages = () => {
     };
 
     return (
-        <>
-            
-            <div className="container" style={{ maxWidth: 1100, margin: '0 auto', padding: '0 16px 40px' }}>
-                <h1 style={{ fontSize: 28, fontWeight: 700, marginBottom: 24, display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <MessageCircle size={28} /> Messages
-                </h1>
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: selectedPartner ? '300px 1fr' : '1fr',
-                    gap: 0,
-                    border: '1px solid var(--border)',
-                    borderRadius: 16,
-                    overflow: 'hidden',
-                    height: 600,
-                    background: 'white'
-                }}>
-                    {/* Partners list */}
-                    <div style={{ borderRight: '1px solid var(--border)', overflowY: 'auto' }}>
-                        <div style={{ padding: 16, borderBottom: '1px solid var(--border)', fontWeight: 600, fontSize: 16 }}>
-                            Conversations
-                        </div>
-                        {loading ? (
-                            <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>Loading...</div>
-                        ) : partners.length === 0 ? (
-                            <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>
-                                <MessageCircle size={40} style={{ opacity: 0.3, marginBottom: 12 }} />
-                                <p>No conversations yet</p>
-                                <p style={{ fontSize: 13 }}>Buyers will contact you here.</p>
-                            </div>
-                        ) : partners.map(p => (
-                            <div key={p.userId} onClick={() => setSelectedPartner(p)} style={{
-                                padding: '14px 16px', cursor: 'pointer',
-                                borderBottom: '1px solid var(--border)',
-                                background: selectedPartner?.userId === p.userId ? 'var(--primary-light)' : 'transparent',
-                                transition: 'background 0.2s',
-                                display: 'flex', alignItems: 'center', gap: 12
-                            }}>
-                                <div style={{
-                                    width: 42, height: 42, borderRadius: '50%',
-                                    background: 'linear-gradient(135deg, var(--primary), var(--primary-dark))',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
-                                }}>
-                                    <User size={20} color="white" />
-                                </div>
-                                <div style={{ flex: 1, minWidth: 0 }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <span style={{ fontWeight: 600, fontSize: 14 }}>{p.fullName}</span>
-                                        {p.unreadCount > 0 && (
-                                            <span style={{
-                                                background: 'var(--primary)', color: 'white',
-                                                fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 10
-                                            }}>{p.unreadCount}</span>
-                                        )}
-                                    </div>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}>
-                                        <span style={{
-                                            fontSize: 12, color: 'var(--text-muted)',
-                                            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 140
-                                        }}>
-                                            {p.lastMessage?.content || 'No messages'}
-                                        </span>
-                                        <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>{roleLabel(p.role)}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
+        <div className="animate-fade-in" style={{ height: 'calc(100vh - 80px)', display: 'flex', flexDirection: 'column' }}>
+            <h1 style={{ fontSize: 28, fontWeight: 700, marginBottom: 24, display: 'flex', alignItems: 'center', gap: 12 }}>
+                <MessageCircle size={28} /> Messages
+            </h1>
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: selectedPartner ? '300px 1fr' : '1fr',
+                gap: 0,
+                border: '1px solid var(--border)',
+                borderRadius: 16,
+                overflow: 'hidden',
+                flex: 1,
+                background: 'white',
+                boxShadow: 'var(--shadow-sm)'
+            }}>
+                {/* Partners list */}
+                <div style={{ borderRight: '1px solid var(--border)', overflowY: 'auto' }}>
+                    <div style={{ padding: 16, borderBottom: '1px solid var(--border)', fontWeight: 600, fontSize: 16 }}>
+                        Conversations
                     </div>
-
-                    {/* Chat area */}
-                    {selectedPartner ? (
-                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    {loading ? (
+                        <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>Loading...</div>
+                    ) : partners.length === 0 ? (
+                        <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>
+                            <MessageCircle size={40} style={{ opacity: 0.3, marginBottom: 12 }} />
+                            <p>No conversations yet</p>
+                            <p style={{ fontSize: 13 }}>Buyers will contact you here.</p>
+                        </div>
+                    ) : partners.map(p => (
+                        <div key={p.userId} onClick={() => setSelectedPartner(p)} style={{
+                            padding: '14px 16px', cursor: 'pointer',
+                            borderBottom: '1px solid var(--border)',
+                            background: selectedPartner?.userId === p.userId ? 'var(--primary-light)' : 'transparent',
+                            transition: 'background 0.2s',
+                            display: 'flex', alignItems: 'center', gap: 12
+                        }}>
                             <div style={{
-                                padding: '12px 20px', borderBottom: '1px solid var(--border)',
-                                display: 'flex', alignItems: 'center', gap: 12, background: '#fafafa'
+                                width: 42, height: 42, borderRadius: '50%',
+                                background: 'linear-gradient(135deg, var(--primary), var(--primary-dark))',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
                             }}>
-                                <button onClick={() => setSelectedPartner(null)} style={{
-                                    border: 'none', background: 'transparent', cursor: 'pointer', display: 'flex'
-                                }}>
-                                    <ArrowLeft size={20} />
-                                </button>
-                                <div style={{
-                                    width: 36, height: 36, borderRadius: '50%',
-                                    background: 'linear-gradient(135deg, var(--primary), var(--primary-dark))',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center'
-                                }}>
-                                    <User size={16} color="white" />
+                                <User size={20} color="white" />
+                            </div>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <span style={{ fontWeight: 600, fontSize: 14 }}>{p.fullName}</span>
+                                    {p.unreadCount > 0 && (
+                                        <span style={{
+                                            background: 'var(--primary)', color: 'white',
+                                            fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 10
+                                        }}>{p.unreadCount}</span>
+                                    )}
                                 </div>
-                                <div>
-                                    <div style={{ fontWeight: 600, fontSize: 15 }}>{selectedPartner.fullName}</div>
-                                    <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{roleLabel(selectedPartner.role)}</div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}>
+                                    <span style={{
+                                        fontSize: 12, color: 'var(--text-muted)',
+                                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 140
+                                    }}>
+                                        {p.lastMessage?.content || 'No messages'}
+                                    </span>
+                                    <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>{roleLabel(p.role)}</span>
                                 </div>
                             </div>
+                        </div>
+                    ))}
+                </div>
 
-                            <div style={{ flex: 1, overflowY: 'auto', padding: 20, display: 'flex', flexDirection: 'column', gap: 10 }}>
-                                {messages.length === 0 ? (
-                                    <div style={{ textAlign: 'center', color: 'var(--text-muted)', marginTop: 80 }}>
-                                        <MessageCircle size={48} style={{ opacity: 0.2, marginBottom: 12 }} />
-                                        <p>No messages yet. Say hello! 👋</p>
-                                    </div>
-                                ) : messages.map(msg => {
-                                    const isMine = msg.senderId === user?.id;
-                                    return (
-                                        <div key={msg.id} style={{ display: 'flex', justifyContent: isMine ? 'flex-end' : 'flex-start' }}>
+                {/* Chat area */}
+                {selectedPartner ? (
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <div style={{
+                            padding: '12px 20px', borderBottom: '1px solid var(--border)',
+                            display: 'flex', alignItems: 'center', gap: 12, background: '#fafafa'
+                        }}>
+                            <button onClick={() => setSelectedPartner(null)} style={{
+                                border: 'none', background: 'transparent', cursor: 'pointer', display: 'flex'
+                            }}>
+                                <ArrowLeft size={20} />
+                            </button>
+                            <div style={{
+                                width: 36, height: 36, borderRadius: '50%',
+                                background: 'linear-gradient(135deg, var(--primary), var(--primary-dark))',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center'
+                            }}>
+                                <User size={16} color="white" />
+                            </div>
+                            <div>
+                                <div style={{ fontWeight: 600, fontSize: 15 }}>{selectedPartner.fullName}</div>
+                                <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{roleLabel(selectedPartner.role)}</div>
+                            </div>
+                        </div>
+
+                        <div style={{ flex: 1, overflowY: 'auto', padding: 20, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                            {messages.length === 0 ? (
+                                <div style={{ textAlign: 'center', color: 'var(--text-muted)', marginTop: 80 }}>
+                                    <MessageCircle size={48} style={{ opacity: 0.2, marginBottom: 12 }} />
+                                    <p>No messages yet. Say hello! 👋</p>
+                                </div>
+                            ) : messages.map(msg => {
+                                const isMine = msg.senderId === user?.id;
+                                return (
+                                    <div key={msg.id} style={{ display: 'flex', justifyContent: isMine ? 'flex-end' : 'flex-start' }}>
+                                        <div style={{
+                                            maxWidth: '70%', padding: '10px 16px',
+                                            borderRadius: isMine ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+                                            background: isMine
+                                                ? 'linear-gradient(135deg, var(--primary), var(--primary-dark))'
+                                                : '#f0f0f0',
+                                            color: isMine ? 'white' : 'var(--text-main)',
+                                            fontSize: 14, lineHeight: 1.5
+                                        }}>
+                                            <div>{msg.content}</div>
                                             <div style={{
-                                                maxWidth: '70%', padding: '10px 16px',
-                                                borderRadius: isMine ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
-                                                background: isMine
-                                                    ? 'linear-gradient(135deg, var(--primary), var(--primary-dark))'
-                                                    : '#f0f0f0',
-                                                color: isMine ? 'white' : 'var(--text-main)',
-                                                fontSize: 14, lineHeight: 1.5
+                                                fontSize: 10, opacity: 0.7, marginTop: 4, textAlign: 'right',
+                                                display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 4
                                             }}>
-                                                <div>{msg.content}</div>
-                                                <div style={{
-                                                    fontSize: 10, opacity: 0.7, marginTop: 4, textAlign: 'right',
-                                                    display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 4
-                                                }}>
-                                                    <Clock size={10} /> {formatTime(msg.createdAt)}
-                                                </div>
+                                                <Clock size={10} /> {formatTime(msg.createdAt)}
                                             </div>
                                         </div>
-                                    );
-                                })}
-                                <div ref={messagesEndRef} />
-                            </div>
+                                    </div>
+                                );
+                            })}
+                            <div ref={messagesEndRef} />
+                        </div>
 
-                            <form onSubmit={sendMessage} style={{
-                                padding: '12px 20px', borderTop: '1px solid var(--border)',
-                                display: 'flex', gap: 10, background: '#fafafa'
-                            }}>
-                                <input value={newMessage} onChange={e => setNewMessage(e.target.value)}
-                                    placeholder="Type a message..." style={{
-                                        flex: 1, padding: '10px 16px', borderRadius: 24,
-                                        border: '1px solid var(--border)', fontSize: 14, outline: 'none'
-                                    }} />
-                                <button type="submit" disabled={sending || !newMessage.trim()} style={{
-                                    width: 44, height: 44, borderRadius: '50%',
-                                    background: 'var(--primary)', border: 'none', cursor: 'pointer',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    opacity: (!newMessage.trim() || sending) ? 0.5 : 1
-                                }}>
-                                    <Send size={18} color="white" />
-                                </button>
-                            </form>
-                        </div>
-                    ) : (
-                        !partners.length ? null :
-                        <div style={{
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            flexDirection: 'column', color: 'var(--text-muted)'
+                        <form onSubmit={sendMessage} style={{
+                            padding: '12px 20px', borderTop: '1px solid var(--border)',
+                            display: 'flex', gap: 10, background: '#fafafa'
                         }}>
-                            <MessageCircle size={64} style={{ opacity: 0.15, marginBottom: 16 }} />
-                            <p style={{ fontSize: 16 }}>Select a conversation to start chatting</p>
-                        </div>
-                    )}
-                </div>
+                            <input value={newMessage} onChange={e => setNewMessage(e.target.value)}
+                                placeholder="Type a message..." style={{
+                                    flex: 1, padding: '10px 16px', borderRadius: 24,
+                                    border: '1px solid var(--border)', fontSize: 14, outline: 'none'
+                                }} />
+                            <button type="submit" disabled={sending || !newMessage.trim()} style={{
+                                width: 44, height: 44, borderRadius: '50%',
+                                background: 'var(--primary)', border: 'none', cursor: 'pointer',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                opacity: (!newMessage.trim() || sending) ? 0.5 : 1
+                            }}>
+                                <Send size={18} color="white" />
+                            </button>
+                        </form>
+                    </div>
+                ) : (
+                    !partners.length ? null :
+                    <div style={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        flexDirection: 'column', color: 'var(--text-muted)'
+                    }}>
+                        <MessageCircle size={64} style={{ opacity: 0.15, marginBottom: 16 }} />
+                        <p style={{ fontSize: 16 }}>Select a conversation to start chatting</p>
+                    </div>
+                )}
             </div>
-        </>
+        </div>
     );
 };
 

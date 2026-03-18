@@ -121,102 +121,99 @@ const ManageNegotiations = () => {
     };
 
     return (
-        <div style={{ display: 'flex' }}>
-            
-            <main style={{ marginLeft: '260px', flex: 1, padding: '40px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
-                    <div>
-                        <h1 style={{ fontSize: '28px', fontWeight: '700' }}>Price Negotiations</h1>
-                        <p style={{ color: 'var(--text-muted)' }}>Review and respond to buyer offers.</p>
-                    </div>
-                    <button onClick={fetchNegotiations} className="btn" style={{ background: 'white', border: '1px solid var(--border)' }}>
-                        <RefreshCcw size={16} /> Refresh
-                    </button>
+        <div className="animate-fade-in">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+                <div>
+                    <h1 style={{ fontSize: '28px', fontWeight: '700' }}>Price Negotiations</h1>
+                    <p style={{ color: 'var(--text-muted)' }}>Review and respond to buyer offers.</p>
                 </div>
+                <button onClick={fetchNegotiations} className="btn" style={{ background: 'white', border: '1px solid var(--border)' }}>
+                    <RefreshCcw size={16} /> Refresh
+                </button>
+            </div>
 
-                {loading ? (
-                    <div style={{ textAlign: 'center', padding: '100px 0' }}>
-                        <div className="animate-spin" style={{ width: '40px', height: '40px', border: '4px solid var(--primary-light)', borderTopColor: 'var(--primary)', borderRadius: '50%', margin: '0 auto' }}></div>
-                    </div>
-                ) : negotiations.length === 0 ? (
-                    <div className="card" style={{ padding: '60px', textAlign: 'center' }}>
-                        <MessageSquare size={48} color="var(--text-muted)" style={{ margin: '0 auto 20px' }} />
-                        <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '8px' }}>No pending offers</h2>
-                        <p style={{ color: 'var(--text-muted)' }}>Buyers will send offers when they want to negotiate your prices.</p>
-                    </div>
-                ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                        {negotiations.map(neg => (
-                            <div key={neg.id} className="card" style={{ padding: '24px', display: 'grid', gridTemplateColumns: 'minmax(200px, 1fr) 2fr 1fr', gap: '32px', alignItems: 'center' }}>
-                                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                                    <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'var(--primary-light)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        <MessageSquare size={20} color="var(--primary)" />
-                                    </div>
-                                    <div>
-                                        <h3 style={{ fontSize: '16px', fontWeight: '700' }}>{neg.cropName}</h3>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: 'var(--text-muted)' }}>
-                                            <User size={12} /> {neg.buyerName}
-                                        </div>
-                                    </div>
+            {loading ? (
+                <div style={{ textAlign: 'center', padding: '100px 0' }}>
+                    <div className="animate-spin" style={{ width: '40px', height: '40px', border: '4px solid var(--primary-light)', borderTopColor: 'var(--primary)', borderRadius: '50%', margin: '0 auto' }}></div>
+                </div>
+            ) : negotiations.length === 0 ? (
+                <div className="card" style={{ padding: '60px', textAlign: 'center' }}>
+                    <MessageSquare size={48} color="var(--text-muted)" style={{ margin: '0 auto 20px' }} />
+                    <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '8px' }}>No pending offers</h2>
+                    <p style={{ color: 'var(--text-muted)' }}>Buyers will send offers when they want to negotiate your prices.</p>
+                </div>
+            ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    {negotiations.map(neg => (
+                        <div key={neg.id} className="card" style={{ padding: '24px', display: 'grid', gridTemplateColumns: 'minmax(200px, 1fr) 2fr 1fr', gap: '32px', alignItems: 'center' }}>
+                            <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                                <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'var(--primary-light)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <MessageSquare size={20} color="var(--primary)" />
                                 </div>
-
-                                <div style={{ display: 'flex', gap: '24px', background: '#f8fafc', padding: '12px 20px', borderRadius: '12px' }}>
-                                    <div>
-                                        <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase' }}>Listed Price</p>
-                                        <p style={{ fontWeight: '600' }}>₹{neg.originalPrice}/kg</p>
+                                <div>
+                                    <h3 style={{ fontSize: '16px', fontWeight: '700' }}>{neg.cropName}</h3>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: 'var(--text-muted)' }}>
+                                        <User size={12} /> {neg.buyerName}
                                     </div>
-                                    <div>
-                                        <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase' }}>{neg.status === 'COUNTERED' ? 'Your Counter' : "Buyer's Offer"}</p>
-                                        <p style={{ fontWeight: '700', color: 'var(--primary)' }}>₹{neg.status === 'COUNTERED' ? neg.counterPrice : neg.offeredPrice}/kg</p>
-                                    </div>
-                                    <div>
-                                        <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase' }}>Quantity</p>
-                                        <p style={{ fontWeight: '600' }}>{neg.quantity} kg</p>
-                                    </div>
-                                    {neg.message && (
-                                        <div style={{ flex: 1, borderLeft: '1px solid var(--border)', paddingLeft: '20px' }}>
-                                            <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase' }}>Buyer Message</p>
-                                            <p style={{ fontSize: '13px', fontStyle: 'italic' }}>"{neg.message}"</p>
-                                        </div>
-                                    )}
-                                </div>
-
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                    <div style={{ display: 'inline-flex', alignSelf: 'flex-end', padding: '4px 12px', borderRadius: '100px', fontSize: '12px', fontWeight: '700', ...getStatusStyle(neg.status) }}>
-                                        {neg.status}
-                                    </div>
-
-                                    {neg.status === 'PENDING' && (
-                                        <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                                            <button
-                                                onClick={() => handleUpdateStatus(neg.id, 'ACCEPTED')}
-                                                className="btn btn-primary"
-                                                style={{ padding: '8px 12px', fontSize: '13px' }}
-                                            >
-                                                <Check size={14} /> Accept
-                                            </button>
-                                            <button
-                                                onClick={() => setCounterModal(neg)}
-                                                className="btn"
-                                                style={{ padding: '8px 12px', fontSize: '13px', background: '#f3e8ff', color: '#6b21a8', border: 'none' }}
-                                            >
-                                                Counter
-                                            </button>
-                                            <button
-                                                onClick={() => handleUpdateStatus(neg.id, 'REJECTED')}
-                                                className="btn"
-                                                style={{ background: '#fee2e2', color: '#991b1b', padding: '8px 12px', fontSize: '13px' }}
-                                            >
-                                                <X size={14} /> Reject
-                                            </button>
-                                        </div>
-                                    )}
                                 </div>
                             </div>
-                        ))}
-                    </div>
-                )}
-            </main>
+
+                            <div style={{ display: 'flex', gap: '24px', background: '#f8fafc', padding: '12px 20px', borderRadius: '12px' }}>
+                                <div>
+                                    <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase' }}>Listed Price</p>
+                                    <p style={{ fontWeight: '600' }}>₹{neg.originalPrice}/kg</p>
+                                </div>
+                                <div>
+                                    <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase' }}>{neg.status === 'COUNTERED' ? 'Your Counter' : "Buyer's Offer"}</p>
+                                    <p style={{ fontWeight: '700', color: 'var(--primary)' }}>₹{neg.status === 'COUNTERED' ? neg.counterPrice : neg.offeredPrice}/kg</p>
+                                </div>
+                                <div>
+                                    <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase' }}>Quantity</p>
+                                    <p style={{ fontWeight: '600' }}>{neg.quantity} kg</p>
+                                </div>
+                                {neg.message && (
+                                    <div style={{ flex: 1, borderLeft: '1px solid var(--border)', paddingLeft: '20px' }}>
+                                        <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase' }}>Buyer Message</p>
+                                        <p style={{ fontSize: '13px', fontStyle: 'italic' }}>"{neg.message}"</p>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                <div style={{ display: 'inline-flex', alignSelf: 'flex-end', padding: '4px 12px', borderRadius: '100px', fontSize: '12px', fontWeight: '700', ...getStatusStyle(neg.status) }}>
+                                    {neg.status}
+                                </div>
+
+                                {neg.status === 'PENDING' && (
+                                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                                        <button
+                                            onClick={() => handleUpdateStatus(neg.id, 'ACCEPTED')}
+                                            className="btn btn-primary"
+                                            style={{ padding: '8px 12px', fontSize: '13px' }}
+                                        >
+                                            <Check size={14} /> Accept
+                                        </button>
+                                        <button
+                                            onClick={() => setCounterModal(neg)}
+                                            className="btn"
+                                            style={{ padding: '8px 12px', fontSize: '13px', background: '#f3e8ff', color: '#6b21a8', border: 'none' }}
+                                        >
+                                            Counter
+                                        </button>
+                                        <button
+                                            onClick={() => handleUpdateStatus(neg.id, 'REJECTED')}
+                                            className="btn"
+                                            style={{ background: '#fee2e2', color: '#991b1b', padding: '8px 12px', fontSize: '13px' }}
+                                        >
+                                            <X size={14} /> Reject
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
 
             {counterModal && (
                 <CounterOfferModal

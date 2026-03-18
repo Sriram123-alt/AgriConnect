@@ -14,6 +14,8 @@ import Payments from './pages/Payments';
 import Messages from './pages/Messages';
 import MyReviews from './pages/MyReviews';
 
+import MainLayout from './components/MainLayout';
+
 const PrivateRoute = ({ children }) => {
     const { user, loading } = useAuth();
 
@@ -23,7 +25,7 @@ const PrivateRoute = ({ children }) => {
         </div>
     );
 
-    return user ? children : <Navigate to="/login" />;
+    return user ? <MainLayout>{children}</MainLayout> : <Navigate to="/login" />;
 };
 
 function App() {
@@ -120,7 +122,6 @@ function App() {
                     </PrivateRoute>
                 }
             />
-            {/* Catch-all route to home if not found */}
             <Route path="*" element={<Navigate to="/" />} />
         </Routes>
     );
