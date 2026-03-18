@@ -65,10 +65,20 @@ const CropDetails = () => {
         alert(`Added ${quantity}kg of ${crop.name} to cart!`);
     };
 
+    const getPlaceholder = (name) => {
+        const n = name?.toLowerCase() || '';
+        if (n.includes('wheat')) return 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=800';
+        if (n.includes('rice')) return 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=800';
+        if (n.includes('corn') || n.includes('maize')) return 'https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=800';
+        if (n.includes('tomato')) return 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=800';
+        if (n.includes('potato')) return 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=800';
+        return 'https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=800';
+    };
+
     if (loading) return <div style={{ textAlign: 'center', padding: '100px' }}><div className="animate-spin" style={{ width: '40px', height: '40px', border: '4px solid var(--primary-light)', borderTopColor: 'var(--primary)', borderRadius: '50%', margin: '0 auto' }}></div></div>;
     if (!crop) return <div className="container" style={{ padding: '40px', textAlign: 'center' }}><p>Crop not found.</p><button onClick={() => navigate('/marketplace')} className="btn btn-primary">Back to Marketplace</button></div>;
 
-    const images = crop.imageUrls?.length > 0 ? crop.imageUrls : ['https://images.unsplash.com/photo-1488459716781-6918f33427e1?auto=format&fit=crop&q=80&w=800'];
+    const images = crop.imageUrls?.length > 0 ? crop.imageUrls : [getPlaceholder(crop.name)];
 
     return (
         <div className="animate-fade-in">
@@ -161,7 +171,7 @@ const CropDetails = () => {
                         <div style={{ padding: '20px', background: '#f8fafc', borderRadius: '16px', marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <div>
                                 <p style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: '600', marginBottom: '4px' }}>Price per kg</p>
-                                <p style={{ fontSize: '28px', fontWeight: '800', color: 'var(--primary)' }}>₹{crop.pricePerKg.toFixed(2)}</p>
+                                <p style={{ fontSize: '28px', fontWeight: '800', color: 'var(--primary)' }}>₹{crop.pricePerKg?.toFixed(2) || '0.00'}</p>
                             </div>
                             <div style={{ textAlign: 'right' }}>
                                 <p style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: '600', marginBottom: '4px' }}>Available Stock</p>

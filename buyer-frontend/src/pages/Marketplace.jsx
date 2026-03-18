@@ -20,6 +20,16 @@ const Marketplace = () => {
         return () => clearInterval(interval);
     }, []);
 
+    const getPlaceholder = (name) => {
+        const n = name?.toLowerCase() || '';
+        if (n.includes('wheat')) return 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=800';
+        if (n.includes('rice')) return 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=800';
+        if (n.includes('corn') || n.includes('maize')) return 'https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=800';
+        if (n.includes('tomato')) return 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=800';
+        if (n.includes('potato')) return 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=800';
+        return 'https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=800';
+    };
+
     const fetchCrops = async () => {
         try {
             setLoading(true);
@@ -35,7 +45,7 @@ const Marketplace = () => {
                     rating: crop.averageRating || 4.5,
                     imageUrl: crop.imageUrls && crop.imageUrls.length > 0
                         ? crop.imageUrls[0]
-                        : 'https://images.unsplash.com/photo-1488459716781-6918f33427e1?auto=format&fit=crop&q=80&w=400',
+                        : getPlaceholder(crop.name),
                     location: crop.location || 'Unknown Location',
                     quantity: crop.quantity || 0,
                     pricePerKg: crop.pricePerKg // Added for cart context
@@ -67,9 +77,9 @@ const Marketplace = () => {
 
     const filteredCrops = crops.filter(crop =>
         (crop.quantity > 0) && (
-            crop.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            crop.farmer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            crop.location.toLowerCase().includes(searchTerm.toLowerCase())
+            crop.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            crop.farmer?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            crop.location?.toLowerCase().includes(searchTerm.toLowerCase())
         )
     );
 

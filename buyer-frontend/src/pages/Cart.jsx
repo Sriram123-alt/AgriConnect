@@ -151,6 +151,16 @@ const Cart = () => {
         );
     }
 
+    const getPlaceholder = (name) => {
+        const n = name?.toLowerCase() || '';
+        if (n.includes('wheat')) return 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=800';
+        if (n.includes('rice')) return 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=800';
+        if (n.includes('corn') || n.includes('maize')) return 'https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=800';
+        if (n.includes('tomato')) return 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=800';
+        if (n.includes('potato')) return 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=800';
+        return 'https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=800';
+    };
+
     return (
         <div className="animate-fade-in">
             <h1 style={{ fontSize: '28px', fontWeight: '700', marginBottom: '32px' }}>Shopping Cart</h1>
@@ -162,7 +172,7 @@ const Cart = () => {
                         <div key={item.id} className="card" style={{ padding: '20px', display: 'flex', gap: '20px', alignItems: 'center' }}>
                             <div style={{ width: '80px', height: '80px', borderRadius: '12px', overflow: 'hidden', background: '#f1f5f9', flexShrink: 0 }}>
                                 <img
-                                    src={item.imageUrl || `https://images.unsplash.com/photo-1595231712325-9fdec20aa102?q=80&w=200&h=200&auto=format&fit=crop`}
+                                    src={item.imageUrl || getPlaceholder(item.name)}
                                     alt={item.name}
                                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                 />
