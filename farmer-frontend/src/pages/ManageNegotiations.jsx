@@ -180,8 +180,16 @@ const ManageNegotiations = () => {
                             </div>
 
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                <div style={{ display: 'inline-flex', alignSelf: 'flex-end', padding: '4px 12px', borderRadius: '100px', fontSize: '12px', fontWeight: '700', ...getStatusStyle(neg.status) }}>
-                                    {neg.status}
+                                <div style={{ display: 'flex', gap: '8px', alignSelf: 'flex-end', alignItems: 'center' }}>
+                                    <button 
+                                        onClick={() => navigate(`/messages?userId=${neg.buyerId}`)}
+                                        style={{ background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', fontWeight: '700' }}
+                                    >
+                                        <MessageSquare size={14} /> Chat
+                                    </button>
+                                    <div style={{ padding: '4px 12px', borderRadius: '100px', fontSize: '12px', fontWeight: '700', ...getStatusStyle(neg.status) }}>
+                                        {neg.status}
+                                    </div>
                                 </div>
 
                                 {neg.status === 'PENDING' && (

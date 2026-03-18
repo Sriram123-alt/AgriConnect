@@ -135,6 +135,8 @@ public class NegotiationServiceImpl implements NegotiationService {
                 .cropName(n.getCrop().getName())
                 .buyerId(n.getBuyer().getId())
                 .buyerName(n.getBuyer().getFullName())
+                .farmerId(n.getCrop().getFarmer().getId())
+                .farmerName(n.getCrop().getFarmer().getFullName())
                 .offeredPrice(n.getOfferedPrice())
                 .originalPrice(n.getCrop().getPricePerKg())
                 .quantity(n.getQuantity())

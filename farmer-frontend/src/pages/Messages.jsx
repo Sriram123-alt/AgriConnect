@@ -16,14 +16,6 @@ const Messages = () => {
     useEffect(() => {
         fetchPartners();
         const interval = setInterval(fetchPartners, 8000);
-
-        // Handle direct message from other pages
-        const params = new URLSearchParams(window.location.search);
-        const directUserId = params.get('userId');
-        if (directUserId) {
-            startDirectChat(directUserId);
-        }
-
         return () => clearInterval(interval);
     }, []);
 
@@ -35,19 +27,36 @@ const Messages = () => {
                 setSelectedPartner(existing);
             } else {
                 // Fetch user info to create a "temporary" partner object
-                const res = await api.get(`/api/users/profile/${targetId}`);
+                const res = await api.get(`/api/reviews/profile/${targetId}`);
                 if (res.data.success) {
                     const u = res.data.data;
-                    setSelectedPartner({
+                    const newPartner = {
                         userId: u.id,
                         fullName: u.fullName,
                         role: u.role,
                         unreadCount: 0
+                    };
+                    setPartners(prev => {
+                        if (prev.find(p => p.userId === newPartner.userId)) return prev;
+                        return [newPartner, ...prev];
                     });
+                    setSelectedPartner(newPartner);
                 }
             }
-        } catch (e) { console.error('Failed to start direct chat', e); }
+        } catch (e) {
+            console.error('Failed to start direct chat', e);
+        }
     };
+
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const directUserId = params.get('userId');
+        if (directUserId) {
+            startDirectChat(directUserId);
+            // Clear URL param after use to avoid re-triggering
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    }, [window.location.search, partners.length]);
 
     useEffect(() => {
         if (selectedPartner) {
@@ -65,7 +74,16 @@ const Messages = () => {
     const fetchPartners = async () => {
         try {
             const res = await api.get('/api/chat/partners');
-            if (res.data.success) setPartners(res.data.data);
+            if (res.data.success) {
+                const serverPartners = res.data.data;
+                // Preserve temporary partner if they are currently selected but not in the server list yet
+                setPartners(prev => {
+                    if (selectedPartner && !serverPartners.find(p => p.userId === selectedPartner.userId)) {
+                        return [selectedPartner, ...serverPartners];
+                    }
+                    return serverPartners;
+                });
+            }
         } catch (e) { console.error(e); }
         finally { setLoading(false); }
     };

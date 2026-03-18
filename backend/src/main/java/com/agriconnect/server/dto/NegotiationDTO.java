@@ -19,6 +19,8 @@ public class NegotiationDTO {
     private String cropName;
     private Long buyerId;
     private String buyerName;
+    private Long farmerId;
+    private String farmerName;
     private BigDecimal offeredPrice;
     private BigDecimal originalPrice;
     private Double quantity;

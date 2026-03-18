@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { MessageSquare, Check, X, Clock, RefreshCcw } from 'lucide-react';
 import api from '../api/api';
 import { useCart } from '../context/CartContext';
 
 const Negotiations = () => {
+    const navigate = useNavigate();
     const { addToCart } = useCart();
     const [negotiations, setNegotiations] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -88,8 +90,16 @@ const Negotiations = () => {
                                         <p style={{ fontSize: '14px', color: 'var(--text-muted)' }}>Farmer: {neg.farmerName}</p>
                                     </div>
                                 </div>
-                                <div style={{ padding: '6px 12px', borderRadius: '100px', fontSize: '12px', fontWeight: '700', ...getStatusStyle(neg.status) }}>
-                                    {neg.status}
+                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
+                                    <div style={{ padding: '6px 12px', borderRadius: '100px', fontSize: '12px', fontWeight: '700', ...getStatusStyle(neg.status) }}>
+                                        {neg.status}
+                                    </div>
+                                    <button 
+                                        onClick={() => navigate(`/messages?userId=${neg.farmerId}`)}
+                                        style={{ background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', fontWeight: '700' }}
+                                    >
+                                        <MessageSquare size={14} /> Chat
+                                    </button>
                                 </div>
                             </div>
 
