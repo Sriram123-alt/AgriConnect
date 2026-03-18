@@ -165,6 +165,20 @@ const Orders = () => {
                                             <MetaBlock label="Pay Status" value={order.paymentStatus || 'PENDING'} bold color={order.paymentStatus === 'PAID' ? '#16a34a' : '#f59e0b'} />
                                             <MetaBlock label="Items" value={`${order.items?.length || 0} item(s)`} />
                                         </div>
+                                            {order.status === 'DELIVERED' && (
+                                                <button
+                                                    onClick={() => navigate(`/reviews?orderId=${order.id}`)}
+                                                    style={{
+                                                        display: 'flex', alignItems: 'center', gap: 6,
+                                                        padding: '5px 12px', borderRadius: 100,
+                                                        background: 'var(--primary-light)', border: '1px solid var(--primary)',
+                                                        color: 'var(--primary-dark)', fontWeight: 700, fontSize: 12,
+                                                        cursor: 'pointer'
+                                                    }}
+                                                >
+                                                    <Star size={13} fill="var(--primary-dark)" /> Rate Order
+                                                </button>
+                                            )}
                                             <button
                                                 onClick={() => navigate(`/track/${order.id}`)}
                                                 style={{

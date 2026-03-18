@@ -13,5 +13,6 @@ public interface ReviewService {
     Page<ReviewDTO> getMyReviews(String email, Pageable pageable);
     List<ReviewDTO> getReviewsForOrder(Long orderId);
     boolean hasReviewed(Long orderId, String email);
+    Page<ReviewDTO> getReviewsForCrop(Long cropId, Pageable pageable);
     UserProfileDTO getUserProfile(Long userId);
 }

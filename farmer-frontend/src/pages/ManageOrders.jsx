@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Package, Truck, CheckCircle, Clock, XCircle, RefreshCcw, User, MessageCircle } from 'lucide-react';
+import { Package, Truck, CheckCircle, Clock, XCircle, RefreshCcw, User, MessageCircle, Star } from 'lucide-react';
 import api from '../api/api';
+import ReviewModal from '../components/ReviewModal';
 
 const ManageOrders = () => {
     const navigate = useNavigate();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [reviewingOrder, setReviewingOrder] = useState(null);
 
     useEffect(() => {
         fetchOrders();
@@ -125,6 +127,20 @@ const ManageOrders = () => {
                                             {order.status === 'SHIPPED' && !order.hasTransport && (
                                                 <button onClick={() => handleUpdateStatus(order.id, 'DELIVERED')} className="btn btn-primary" style={{ background: 'var(--success)' }}>Mark Delivered</button>
                                             )}
+                                            {order.status === 'DELIVERED' && (
+                                                <button 
+                                                    onClick={() => setReviewingOrder(order)} 
+                                                    className="btn btn-secondary" 
+                                                    style={{ 
+                                                        background: 'var(--primary-light)', 
+                                                        border: '2px solid var(--primary)', 
+                                                        color: 'var(--primary-dark)',
+                                                        fontWeight: '700'
+                                                    }}
+                                                >
+                                                    <Star size={16} style={{ marginRight: '8px' }} /> Rate Buyer
+                                                </button>
+                                            )}
                                             {order.hasTransport && (
                                                 <div style={{ padding: '12px', background: 'var(--primary-light)', borderRadius: '10px', border: '1px solid var(--primary)', marginBottom: '10px' }}>
                                                     <p style={{ fontSize: '12px', color: 'var(--primary)', fontWeight: '700', textTransform: 'uppercase', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -171,6 +187,16 @@ const ManageOrders = () => {
                         </div>
                     ))}
                 </div>
+            )}
+            {reviewingOrder && (
+                <ReviewModal 
+                    order={reviewingOrder} 
+                    onClose={() => setReviewingOrder(null)} 
+                    onSuccess={() => {
+                        alert('Review submitted! Thank you.');
+                        fetchOrders();
+                    }}
+                />
             )}
         </div>
     );

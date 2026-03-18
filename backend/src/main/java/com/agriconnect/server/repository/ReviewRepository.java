@@ -29,5 +29,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Query("SELECT COUNT(r) FROM Review r WHERE r.reviewee.id = :userId")
     Long getReviewCountForUser(@Param("userId") Long userId);
 
+    Page<Review> findByCropIdOrderByCreatedAtDesc(Long cropId, Pageable pageable);
+
     boolean existsByOrderIdAndReviewerId(Long orderId, Long reviewerId);
 }

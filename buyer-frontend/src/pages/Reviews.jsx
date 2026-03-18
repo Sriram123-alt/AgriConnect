@@ -15,6 +15,13 @@ const Reviews = () => {
 
     useEffect(() => {
         fetchData();
+        
+        const params = new URLSearchParams(window.location.search);
+        const oId = params.get('orderId');
+        if (oId) {
+            setShowReviewForm(parseInt(oId));
+            setTab('pending');
+        }
     }, []);
 
     const fetchData = async () => {

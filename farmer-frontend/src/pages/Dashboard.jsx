@@ -67,16 +67,22 @@ const FarmerDashboard = () => {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                         <h2 style={{ fontSize: '18px', fontWeight: '700' }}>Quick Actions</h2>
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '20px' }}>
                         <div onClick={() => navigate('/add-crop')} className="card" style={{ padding: '20px', cursor: 'pointer', border: '1px dashed var(--primary)', background: 'var(--primary-light)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                             <Plus size={24} color="var(--primary-dark)" />
-                            <span style={{ fontWeight: '700' }}>List New Crop</span>
-                            <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Add your latest harvest to the marketplace.</p>
+                            <span style={{ fontWeight: '700', fontSize: '14px' }}>List New Crop</span>
                         </div>
                         <div onClick={() => navigate('/negotiations')} className="card" style={{ padding: '20px', cursor: 'pointer', border: '1px dashed var(--accent)', background: '#fffbeb', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                             <MessageSquare size={24} color="var(--accent)" />
-                            <span style={{ fontWeight: '700' }}>Check Offers</span>
-                            <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Review price offers from potential buyers.</p>
+                            <span style={{ fontWeight: '700', fontSize: '14px' }}>Check Offers</span>
+                        </div>
+                        <div onClick={() => navigate('/messages')} className="card" style={{ padding: '20px', cursor: 'pointer', border: '1px dashed #3b82f6', background: '#eff6ff', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                            <MessageCircle size={24} color="#3b82f6" />
+                            <span style={{ fontWeight: '700', fontSize: '14px' }}>Messages</span>
+                        </div>
+                        <div onClick={() => navigate('/reviews')} className="card" style={{ padding: '20px', cursor: 'pointer', border: '1px dashed #f59e0b', background: '#fef3c7', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                            <Star size={24} color="#f59e0b" />
+                            <span style={{ fontWeight: '700', fontSize: '14px' }}>Reviews</span>
                         </div>
                     </div>
                 </div>

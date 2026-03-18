@@ -68,4 +68,14 @@ public class ReviewController {
         UserProfileDTO profile = reviewService.getUserProfile(userId);
         return ResponseEntity.ok(ApiResponse.success(profile, "Profile fetched!"));
     }
+
+    @GetMapping("/crop/{cropId}")
+    public ResponseEntity<ApiResponse<Page<ReviewDTO>>> getReviewsForCrop(
+            @PathVariable Long cropId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<ReviewDTO> result = reviewService.getReviewsForCrop(cropId, pageable);
+        return ResponseEntity.ok(ApiResponse.success(result, "Crop reviews fetched!"));
+    }
 }

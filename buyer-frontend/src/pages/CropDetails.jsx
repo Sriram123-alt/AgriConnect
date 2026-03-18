@@ -15,11 +15,31 @@ const CropDetails = () => {
     const [isNegotiating, setIsNegotiating] = useState(false);
     const [activeImage, setActiveImage] = useState(0);
 
+    const [reviews, setReviews] = useState([]);
+    const [reviewsLoading, setReviewsLoading] = useState(true);
+
     useEffect(() => {
         fetchCrop();
-        const interval = setInterval(fetchCrop, 10000); // Poll every 10s
+        fetchReviews();
+        const interval = setInterval(() => {
+            fetchCrop();
+            fetchReviews();
+        }, 10000);
         return () => clearInterval(interval);
     }, [id]);
+
+    const fetchReviews = async () => {
+        try {
+            const res = await api.get(`/api/reviews/crop/${id}`);
+            if (res.data.success) {
+                setReviews(res.data.data.content || []);
+            }
+        } catch (err) {
+            console.error('Failed to fetch reviews', err);
+        } finally {
+            setReviewsLoading(false);
+        }
+    };
 
     const fetchCrop = async () => {
         try {
@@ -230,30 +250,56 @@ const CropDetails = () => {
                 </div>
             </div>
 
-            {/* Reviews Section Placeholder */}
+            {/* Reviews Section */}
             <div id="reviews" style={{ marginTop: '64px' }}>
                 <h2 style={{ fontSize: '24px', fontWeight: '800', marginBottom: '32px' }}>Customer Reviews</h2>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '24px' }}>
-                    {[1, 2].map(i => (
-                        <div key={i} className="card" style={{ padding: '24px' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-                                <div style={{ display: 'flex', gap: '4px' }}>
-                                    {[...Array(5)].map((_, j) => <Star key={j} size={14} color="#f59e0b" fill={j < (i === 1 ? 5 : 4) ? "#f59e0b" : "none"} />)}
+                
+                {reviewsLoading ? (
+                    <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>Loading reviews...</div>
+                ) : reviews.length === 0 ? (
+                    <div className="card" style={{ padding: '48px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                        <Star size={40} style={{ opacity: 0.2, marginBottom: 16 }} />
+                        <p>No reviews yet for this harvest. Be the first to buy and review!</p>
+                    </div>
+                ) : (
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '24px' }}>
+                        {reviews.map(review => (
+                            <div key={review.id} className="card" style={{ padding: '24px' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
+                                    <div style={{ display: 'flex', gap: '4px' }}>
+                                        {[...Array(5)].map((_, j) => (
+                                            <Star 
+                                                key={j} 
+                                                size={14} 
+                                                color="#f59e0b" 
+                                                fill={j < review.rating ? "#f59e0b" : "none"} 
+                                            />
+                                        ))}
+                                    </div>
+                                    <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                                        {new Date(review.createdAt).toLocaleDateString()}
+                                    </span>
                                 </div>
-                                <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>2 days ago</span>
-                            </div>
-                            <p style={{ fontSize: '14px', fontStyle: 'italic', marginBottom: '16px', color: '#475569' }}>
-                                "{i === 1 ? "Absolutely fresh and high quality. The delivery was fast and the tomatoes were perfectly ripe. Will definitely order again!" : "Good quality produce, but delivery took a bit longer than expected. Overall satisfied with the freshness."}"
-                            </p>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: '700' }}>
-                                    {i === 1 ? 'JD' : 'AS'}
+                                {review.comment && (
+                                    <p style={{ fontSize: '14px', fontStyle: 'italic', marginBottom: '16px', color: '#475569' }}>
+                                        "{review.comment}"
+                                    </p>
+                                )}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                    <div style={{ 
+                                        width: '24px', height: '24px', borderRadius: '50%', 
+                                        background: 'var(--primary-light)', color: 'var(--primary-dark)',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center', 
+                                        fontSize: '10px', fontWeight: '700' 
+                                    }}>
+                                        {review.reviewerName?.charAt(0) || 'U'}
+                                    </div>
+                                    <span style={{ fontSize: '13px', fontWeight: '600' }}>{review.reviewerName}</span>
                                 </div>
-                                <span style={{ fontSize: '13px', fontWeight: '600' }}>{i === 1 ? 'John Doe' : 'Alice Smith'}</span>
                             </div>
-                        </div>
-                    ))}
-                </div>
+                        ))}
+                    </div>
+                )}
             </div>
 
             {isNegotiating && (

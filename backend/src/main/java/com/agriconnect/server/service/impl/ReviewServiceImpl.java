@@ -145,6 +145,11 @@ public class ReviewServiceImpl implements ReviewService {
                 .totalReviews(reviewCount != null ? reviewCount : 0L)
                 .build();
     }
+    
+    @Override
+    public Page<ReviewDTO> getReviewsForCrop(Long cropId, Pageable pageable) {
+        return reviewRepository.findByCropIdOrderByCreatedAtDesc(cropId, pageable).map(this::mapToDTO);
+    }
 
     private ReviewDTO mapToDTO(Review review) {
         return ReviewDTO.builder()
