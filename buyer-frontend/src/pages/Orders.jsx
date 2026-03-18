@@ -97,30 +97,27 @@ const Orders = () => {
     );
 
     return (
-        <div style={{ minHeight: '100vh', background: '#f8fafc' }}>
-            
-            <div className="container" style={{ paddingTop: 32, paddingBottom: 48 }}>
-
-                {/* Header */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32 }}>
-                    <div>
-                        <h1 style={{ fontSize: 28, fontWeight: 800, margin: 0 }}>My Orders</h1>
-                        <p style={{ color: 'var(--text-muted)', marginTop: 4, fontSize: 14 }}>
-                            Track your orders and book transport
-                        </p>
-                    </div>
-                    <div style={{ position: 'relative' }}>
-                        <Search size={16} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-                        <input
-                            type="text"
-                            placeholder="Search orders..."
-                            className="input-field"
-                            value={search}
-                            onChange={e => setSearch(e.target.value)}
-                            style={{ paddingLeft: 36, width: 280 }}
-                        />
-                    </div>
+        <div className="animate-fade-in">
+            {/* Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32 }}>
+                <div>
+                    <h1 style={{ fontSize: 28, fontWeight: 800, margin: 0 }}>My Orders</h1>
+                    <p style={{ color: 'var(--text-muted)', marginTop: 4, fontSize: 14 }}>
+                        Track your orders and book transport
+                    </p>
                 </div>
+                <div style={{ position: 'relative' }}>
+                    <Search size={16} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+                    <input
+                        type="text"
+                        placeholder="Search orders..."
+                        className="input-field"
+                        value={search}
+                        onChange={e => setSearch(e.target.value)}
+                        style={{ paddingLeft: 36, width: 280 }}
+                    />
+                </div>
+            </div>
 
                 {/* Content */}
                 {loading ? (
@@ -347,8 +344,6 @@ const Orders = () => {
                         })}
                     </div>
                 )}
-            </div>
-
             {/* Transport Booking Modal */}
             {bookingModal && (
                 <TransportBookingModal

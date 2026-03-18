@@ -32,47 +32,46 @@ const Payments = () => {
         .reduce((sum, o) => sum + o.items.reduce((itemSum, i) => itemSum + (i.quantity * i.priceAtPurchase), 0), 0);
 
     return (
-        <div style={{ display: 'flex' }}>
-            
-            <main style={{ marginLeft: '260px', flex: 1, padding: '40px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
-                    <div>
-                        <h1 style={{ fontSize: '28px', fontWeight: '800', color: '#1e293b' }}>Payments & Payouts</h1>
-                        <p style={{ color: 'var(--text-muted)' }}>Track the money you receive for fulfilled orders.</p>
-                    </div>
-                    <button onClick={fetchOrders} className="btn" style={{ background: 'white', border: '1px solid var(--border)' }}>
-                        <RefreshCcw size={16} /> Refresh
-                    </button>
+        <div className="animate-fade-in">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+                <div>
+                    <h1 style={{ fontSize: '28px', fontWeight: '800', color: '#1e293b' }}>Payments &amp; Payouts</h1>
+                    <p style={{ color: 'var(--text-muted)' }}>Track the money you receive for fulfilled orders.</p>
                 </div>
+                <button onClick={fetchOrders} className="btn" style={{ background: 'white', border: '1px solid var(--border)' }}>
+                    <RefreshCcw size={16} /> Refresh
+                </button>
+            </div>
 
-                {loading ? (
-                    <div style={{ textAlign: 'center', padding: '100px 0' }}>
-                        <div className="animate-spin" style={{ width: '40px', height: '40px', border: '4px solid var(--primary-light)', borderTopColor: 'var(--primary)', borderRadius: '50%', margin: '0 auto' }}></div>
+            {loading ? (
+                <div style={{ textAlign: 'center', padding: '100px 0' }}>
+                    <div className="animate-spin" style={{ width: '40px', height: '40px', border: '4px solid var(--primary-light)', borderTopColor: 'var(--primary)', borderRadius: '50%', margin: '0 auto' }}></div>
+                </div>
+            ) : (
+                <>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '32px' }}>
+                        <div className="card" style={{ padding: '24px', borderLeft: '4px solid #10b981' }}>
+                            <p style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase', marginBottom: '8px' }}>Total Payouts Received</p>
+                            <p style={{ fontSize: '32px', fontWeight: '800', color: '#10b981' }}>₹{totalEarned.toFixed(2)}</p>
+                        </div>
+                        <div className="card" style={{ padding: '24px', borderLeft: '4px solid #f59e0b' }}>
+                            <p style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase', marginBottom: '8px' }}>Pending Platform Payments</p>
+                            <p style={{ fontSize: '32px', fontWeight: '800', color: '#f59e0b' }}>₹{pendingAmount.toFixed(2)}</p>
+                        </div>
                     </div>
-                ) : (
-                    <>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '32px' }}>
-                            <div className="card" style={{ padding: '24px', borderLeft: '4px solid #10b981' }}>
-                                <p style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase', marginBottom: '8px' }}>Total Payouts Received</p>
-                                <p style={{ fontSize: '32px', fontWeight: '800', color: '#10b981' }}>₹{totalEarned.toFixed(2)}</p>
-                            </div>
-                            <div className="card" style={{ padding: '24px', borderLeft: '4px solid #f59e0b' }}>
-                                <p style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase', marginBottom: '8px' }}>Pending Platform Payments</p>
-                                <p style={{ fontSize: '32px', fontWeight: '800', color: '#f59e0b' }}>₹{pendingAmount.toFixed(2)}</p>
-                            </div>
+
+                    <div className="card" style={{ padding: '24px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
+                            <HandCoins size={20} color="var(--primary)" />
+                            <h2 style={{ fontSize: '18px', fontWeight: '700' }}>Payout History</h2>
                         </div>
 
-                        <div className="card" style={{ padding: '24px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
-                                <HandCoins size={20} color="var(--primary)" />
-                                <h2 style={{ fontSize: '18px', fontWeight: '700' }}>Payout History</h2>
+                        {orders.length === 0 ? (
+                            <div style={{ textAlign: 'center', padding: '40px' }}>
+                                <p style={{ color: 'var(--text-muted)' }}>No completed orders with payment tracked yet.</p>
                             </div>
-
-                            {orders.length === 0 ? (
-                                <div style={{ textAlign: 'center', padding: '40px' }}>
-                                    <p style={{ color: 'var(--text-muted)' }}>No completed orders with payment tracked yet.</p>
-                                </div>
-                            ) : (
+                        ) : (
+                            <div className="table-responsive">
                                 <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                                     <thead style={{ background: '#f8fafc', borderBottom: '1px solid var(--border)' }}>
                                         <tr>
@@ -109,11 +108,11 @@ const Payments = () => {
                                         })}
                                     </tbody>
                                 </table>
-                            )}
-                        </div>
-                    </>
-                )}
-            </main>
+                            </div>
+                        )}
+                    </div>
+                </>
+            )}
         </div>
     );
 };
