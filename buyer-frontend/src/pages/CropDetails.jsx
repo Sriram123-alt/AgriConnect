@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Star, MapPin, ShoppingCart, MessageCircle, ArrowLeft, Shield, Truck, Calendar, User, ChevronRight } from 'lucide-react';
-import Navbar from '../components/Navbar';
 import api from '../api/api';
 import { useCart } from '../context/CartContext';
 import NegotiationModal from '../components/NegotiationModal';
@@ -50,7 +49,7 @@ const CropDetails = () => {
 
     return (
         <div style={{ backgroundColor: '#f8fafc', minHeight: '100vh' }}>
-            <Navbar />
+            
 
             <main className="container" style={{ padding: '40px 20px 80px' }}>
                 <button
@@ -201,18 +200,23 @@ const CropDetails = () => {
                         </div>
 
                         {/* Farmer Card */}
-                        <div className="card" style={{ padding: '24px', marginTop: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                                <div style={{ width: '48px', height: '48px', background: 'var(--primary-light)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <User size={24} color="var(--primary-dark)" />
-                                </div>
-                                <div>
-                                    <p style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: '600' }}>Farmer Profile</p>
-                                    <p style={{ fontWeight: '700' }}>{crop.farmerName}</p>
-                                </div>
-                            </div>
-                            <ChevronRight size={20} color="var(--text-muted)" />
+                <div 
+                    onClick={() => navigate(`/messages?userId=${crop.farmerId}`)}
+                    className="card" style={{ padding: '24px', marginTop: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                        <div style={{ width: '48px', height: '48px', background: 'var(--primary-light)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <User size={24} color="var(--primary-dark)" />
                         </div>
+                        <div>
+                            <p style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: '600' }}>Farmer Profile</p>
+                            <p style={{ fontWeight: '700' }}>{crop.farmerName}</p>
+                        </div>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--primary)', fontWeight: '600', fontSize: '13px' }}>
+                        <MessageCircle size={16} /> Message
+                        <ChevronRight size={18} color="var(--text-muted)" />
+                    </div>
+                </div>
                     </div>
                 </div>
 

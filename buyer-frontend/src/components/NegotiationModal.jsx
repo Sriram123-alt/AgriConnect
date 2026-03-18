@@ -3,7 +3,7 @@ import { X, Send, AlertCircle } from 'lucide-react';
 import api from '../api/api';
 
 const NegotiationModal = ({ crop, onClose, onSuccess }) => {
-    const [offerPrice, setOfferPrice] = useState(crop.price);
+    const [offerPrice, setOfferPrice] = useState(crop.pricePerKg);
     const [quantity, setQuantity] = useState(1);
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(false);
@@ -58,11 +58,11 @@ const NegotiationModal = ({ crop, onClose, onSuccess }) => {
 
                 <div style={{ background: 'var(--primary-light)', padding: '16px', borderRadius: '12px', marginBottom: '24px', display: 'flex', gap: '16px', alignItems: 'center' }}>
                     <div style={{ width: '60px', height: '60px', borderRadius: '8px', background: 'white', overflow: 'hidden' }}>
-                        <img src={crop.image} alt={crop.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <img src={crop.imageUrls?.[0] || 'https://images.unsplash.com/photo-1488459716781-6918f33427e1?auto=format&fit=crop&q=80&w=200'} alt={crop.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     </div>
                     <div>
                         <h3 style={{ fontWeight: '700' }}>{crop.name}</h3>
-                        <p style={{ fontSize: '14px', color: 'var(--primary-dark)', fontWeight: '600' }}>Listed Price: ₹{crop.price}/kg</p>
+                        <p style={{ fontSize: '14px', color: 'var(--primary-dark)', fontWeight: '600' }}>Listed Price: ₹{crop.pricePerKg}/kg</p>
                     </div>
                 </div>
 

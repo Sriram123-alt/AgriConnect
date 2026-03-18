@@ -4,7 +4,6 @@ import {
     Calendar, CheckCircle, Clock, XCircle, RefreshCw, ChevronDown, ChevronUp,
     Navigation, Users, AlertTriangle, Hash
 } from 'lucide-react';
-import Navbar from '../components/Navbar';
 import api from '../api/api';
 
 const STATUS_CONFIG = {
@@ -124,7 +123,7 @@ const Bookings = () => {
     if (loading) {
         return (
             <>
-                <Navbar />
+                
                 <div style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <div className="animate-spin" style={{
                         width: 44, height: 44,
@@ -138,7 +137,7 @@ const Bookings = () => {
 
     return (
         <>
-            <Navbar />
+            
             <div className="container" style={{ padding: '32px 24px' }}>
                 {/* Header */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/api';
 import { useAuth } from '../context/AuthContext';
-import Navbar from '../components/Navbar';
 import { Leaf, IndianRupee, Package, MapPin, Image as ImageIcon, Calendar, FileText, ArrowLeft, Save } from 'lucide-react';
 
 const AddCrop = () => {
@@ -59,7 +58,7 @@ const AddCrop = () => {
 
   return (
     <div style={{ display: 'flex', background: 'var(--background)', minHeight: '100vh' }}>
-      <Navbar />
+      
       <div style={{ marginLeft: '260px', flex: 1, padding: '40px' }}>
         <header style={{ marginBottom: '32px' }}>
           <button

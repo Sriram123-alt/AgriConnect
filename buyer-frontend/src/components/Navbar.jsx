@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingCart, User, LogOut, Sprout, Bell } from 'lucide-react';
+import { ShoppingCart, User, LogOut, Sprout, Bell, MessageCircle, Star } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import NotificationDrawer from './NotificationDrawer';
@@ -13,19 +13,24 @@ const Navbar = () => {
 
     const [isNotifOpen, setIsNotifOpen] = React.useState(false);
     const [unreadCount, setUnreadCount] = React.useState(0);
+    const [unreadChatCount, setUnreadChatCount] = React.useState(0);
 
     React.useEffect(() => {
         if (user) {
-            fetchUnreadCount();
-            const interval = setInterval(fetchUnreadCount, 10000); // Poll every 10s
+            fetchCounts();
+            const interval = setInterval(fetchCounts, 10000); // Poll every 10s
             return () => clearInterval(interval);
         }
     }, [user]);
 
-    const fetchUnreadCount = async () => {
+    const fetchCounts = async () => {
         try {
-            const res = await api.get('/api/notifications/unread-count');
-            if (res.data.success) setUnreadCount(res.data.data);
+            const [notifRes, chatRes] = await Promise.all([
+                api.get('/api/notifications/unread-count'),
+                api.get('/api/chat/unread-count')
+            ]);
+            if (notifRes.data.success) setUnreadCount(notifRes.data.data);
+            if (chatRes.data.success) setUnreadChatCount(chatRes.data.data);
         } catch (_) { }
     };
 
@@ -68,6 +73,33 @@ const Navbar = () => {
                         <Link to="/orders" style={{ textDecoration: 'none', color: 'var(--text-muted)', fontWeight: '500' }}>My Orders</Link>
                         <Link to="/payments" style={{ textDecoration: 'none', color: 'var(--text-muted)', fontWeight: '500' }}>Payments</Link>
                         <Link to="/transport" style={{ textDecoration: 'none', color: 'var(--text-muted)', fontWeight: '500' }}>Transport</Link>
+                        <Link to="/messages" style={{
+                            textDecoration: 'none',
+                            color: 'var(--text-muted)',
+                            fontWeight: '500',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            position: 'relative'
+                        }}>
+                            <MessageCircle size={14} />Chat
+                            {unreadChatCount > 0 && (
+                                <span style={{
+                                    position: 'absolute',
+                                    top: '-4px',
+                                    right: '-12px',
+                                    background: 'var(--primary)',
+                                    color: 'white',
+                                    fontSize: '8px',
+                                    fontWeight: '700',
+                                    padding: '1px 4px',
+                                    borderRadius: '10px'
+                                }}>
+                                    {unreadChatCount}
+                                </span>
+                            )}
+                        </Link>
+                        <Link to="/reviews" style={{ textDecoration: 'none', color: 'var(--text-muted)', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '4px' }}><Star size={14} />Reviews</Link>
 
                         <Link to="/cart" style={{
                             position: 'relative',
@@ -131,7 +163,7 @@ const Navbar = () => {
                 isOpen={isNotifOpen}
                 onClose={() => {
                     setIsNotifOpen(false);
-                    fetchUnreadCount();
+                    fetchCounts();
                 }}
                 setExternalUnreadCount={setUnreadCount}
             />

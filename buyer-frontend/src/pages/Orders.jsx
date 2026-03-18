@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import {
     Package, Truck, CheckCircle, Clock, XCircle, Search,
-    MapPin, User, Phone, Car, Calendar, ChevronDown, ChevronUp
+    MapPin, User, Phone, Car, Calendar, ChevronDown, ChevronUp, MessageCircle
 } from 'lucide-react';
-import Navbar from '../components/Navbar';
 import TransportBookingModal from '../components/TransportBookingModal';
 import api from '../api/api';
 
@@ -33,6 +32,7 @@ const Orders = () => {
     const [transportBookings, setTransportBookings] = useState({}); // orderId → booking
     const [bookingModal, setBookingModal] = useState(null); // order object or null
     const location = useLocation();
+    const navigate = useNavigate();
     const { orderId } = useParams();
 
     useEffect(() => {
@@ -98,7 +98,7 @@ const Orders = () => {
 
     return (
         <div style={{ minHeight: '100vh', background: '#f8fafc' }}>
-            <Navbar />
+            
             <div className="container" style={{ paddingTop: 32, paddingBottom: 48 }}>
 
                 {/* Header */}
@@ -168,7 +168,32 @@ const Orders = () => {
                                             <MetaBlock label="Pay Status" value={order.paymentStatus || 'PENDING'} bold color={order.paymentStatus === 'PAID' ? '#16a34a' : '#f59e0b'} />
                                             <MetaBlock label="Items" value={`${order.items?.length || 0} item(s)`} />
                                         </div>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                            <button
+                                                onClick={() => navigate(`/track/${order.id}`)}
+                                                style={{
+                                                    display: 'flex', alignItems: 'center', gap: 6,
+                                                    padding: '5px 12px', borderRadius: 100,
+                                                    background: 'white', border: '1px solid var(--border)',
+                                                    color: 'var(--primary)', fontWeight: 700, fontSize: 12,
+                                                    cursor: 'pointer'
+                                                }}
+                                            >
+                                                Track Order
+                                            </button>
+                                            {order.items?.[0] && (
+                                                <button
+                                                    onClick={() => navigate(`/messages?userId=${order.items[0].farmerId}`)}
+                                                    style={{
+                                                        display: 'flex', alignItems: 'center', gap: 6,
+                                                        padding: '5px 12px', borderRadius: 100,
+                                                        background: 'white', border: '1px solid var(--border)',
+                                                        color: 'var(--text-main)', fontWeight: 700, fontSize: 12,
+                                                        cursor: 'pointer'
+                                                    }}
+                                                >
+                                                    <MessageCircle size={13} /> Message
+                                                </button>
+                                            )}
                                             <span style={{
                                                 display: 'inline-flex', alignItems: 'center', gap: 6,
                                                 padding: '5px 12px', borderRadius: 100,
@@ -188,7 +213,6 @@ const Orders = () => {
                                             >
                                                 {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                                             </button>
-                                        </div>
                                     </div>
 
                                     {/* Collapsible Details */}

@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { ShoppingCart, Trash2, ArrowLeft, CreditCard, MapPin, Home, Building2, Navigation } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import Navbar from '../components/Navbar';
 import PaymentModal from '../components/PaymentModal';
 import api from '../api/api';
 
@@ -140,7 +139,7 @@ const Cart = () => {
     if (cartItems.length === 0) {
         return (
             <div style={{ minHeight: '100vh' }}>
-                <Navbar />
+                
                 <div className="container" style={{ textAlign: 'center', padding: '100px 0' }}>
                     <div style={{ background: 'var(--primary-light)', width: '80px', height: '80px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
                         <ShoppingCart size={40} color="var(--primary)" />
@@ -157,7 +156,7 @@ const Cart = () => {
 
     return (
         <div style={{ minHeight: '100vh' }}>
-            <Navbar />
+            
             <div className="container">
                 <h1 style={{ fontSize: '28px', fontWeight: '700', marginBottom: '32px' }}>Shopping Cart</h1>
 

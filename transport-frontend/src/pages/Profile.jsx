@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { User, Mail, Phone, MapPin, Building, ShieldCheck, Camera, Edit3, Save } from 'lucide-react';
-import Navbar from '../components/Navbar';
 import { useAuth } from '../context/AuthContext';
 
 const Profile = () => {
@@ -24,7 +23,7 @@ const Profile = () => {
 
     return (
         <>
-            <Navbar />
+            
             <div className="container" style={{ padding: '32px 24px', maxWidth: '1000px' }}>
                 <div style={{ marginBottom: '32px' }}>
                     <h1 style={{ fontSize: '28px', fontWeight: '800' }}>Account Profile</h1>

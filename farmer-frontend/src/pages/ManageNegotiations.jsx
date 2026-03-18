@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { MessageSquare, Check, X, Clock, RefreshCcw, User } from 'lucide-react';
-import Navbar from '../components/Navbar';
 import api from '../api/api';
 
 const CounterOfferModal = ({ negotiation, onClose, onSuccess }) => {
@@ -123,7 +122,7 @@ const ManageNegotiations = () => {
 
     return (
         <div style={{ display: 'flex' }}>
-            <Navbar />
+            
             <main style={{ marginLeft: '260px', flex: 1, padding: '40px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
                     <div>

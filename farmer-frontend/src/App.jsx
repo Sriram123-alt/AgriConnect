@@ -11,6 +11,8 @@ import EditCrop from './pages/EditCrop';
 import ManageNegotiations from './pages/ManageNegotiations';
 import ManageOrders from './pages/ManageOrders';
 import Payments from './pages/Payments';
+import Messages from './pages/Messages';
+import MyReviews from './pages/MyReviews';
 
 const PrivateRoute = ({ children }) => {
     const { user, loading } = useAuth();
@@ -99,6 +101,22 @@ function App() {
                 element={
                     <PrivateRoute>
                         <Payments />
+                    </PrivateRoute>
+                }
+            />
+            <Route
+                path="/messages"
+                element={
+                    <PrivateRoute>
+                        <Messages />
+                    </PrivateRoute>
+                }
+            />
+            <Route
+                path="/reviews"
+                element={
+                    <PrivateRoute>
+                        <MyReviews />
                     </PrivateRoute>
                 }
             />

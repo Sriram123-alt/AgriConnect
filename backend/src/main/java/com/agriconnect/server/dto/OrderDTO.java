@@ -42,6 +42,7 @@ public class OrderDTO {
         private Long cropId;
         private Long negotiationId;
         private String cropName;
+        private Long farmerId;
         private String farmerName;
         private String farmerLocation;
         private BigDecimal priceAtPurchase;

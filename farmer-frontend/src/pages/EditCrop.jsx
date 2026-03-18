@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../api/api';
 import { useAuth } from '../context/AuthContext';
-import Navbar from '../components/Navbar';
 import { Leaf, IndianRupee, Package, MapPin, Image as ImageIcon, Calendar, FileText, ArrowLeft, Save } from 'lucide-react';
 
 const EditCrop = () => {
@@ -92,7 +91,7 @@ const EditCrop = () => {
     if (loading) {
         return (
             <div style={{ display: 'flex' }}>
-                <Navbar />
+                
                 <div style={{ marginLeft: '260px', flex: 1, padding: '100px', textAlign: 'center' }}>
                     <div className="animate-spin" style={{ width: '40px', height: '40px', border: '4px solid var(--primary-light)', borderTopColor: 'var(--primary)', borderRadius: '50%', margin: '0 auto' }}></div>
                 </div>
@@ -102,7 +101,7 @@ const EditCrop = () => {
 
     return (
         <div style={{ display: 'flex', background: 'var(--background)', minHeight: '100vh' }}>
-            <Navbar />
+            
             <div style={{ marginLeft: '260px', flex: 1, padding: '40px' }}>
                 <header style={{ marginBottom: '32px' }}>
                     <button

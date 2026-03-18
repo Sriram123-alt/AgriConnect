@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { ShoppingBag, MessageSquare, TrendingUp, Plus, ArrowUpRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '../components/Navbar';
 import api from '../api/api';
 
 const FarmerDashboard = () => {
@@ -40,7 +39,7 @@ const FarmerDashboard = () => {
 
     return (
         <div style={{ display: 'flex' }}>
-            <Navbar />
+            
             <div style={{ marginLeft: '260px', flex: 1, padding: '40px', overflowY: 'auto' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
                     <div>

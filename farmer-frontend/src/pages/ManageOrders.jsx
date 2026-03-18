@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Package, Truck, CheckCircle, Clock, XCircle, RefreshCcw, User } from 'lucide-react';
-import Navbar from '../components/Navbar';
+import { useNavigate } from 'react-router-dom';
+import { Package, Truck, CheckCircle, Clock, XCircle, RefreshCcw, User, MessageCircle } from 'lucide-react';
 import api from '../api/api';
 
 const ManageOrders = () => {
+    const navigate = useNavigate();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -53,7 +54,7 @@ const ManageOrders = () => {
 
     return (
         <div style={{ display: 'flex' }}>
-            <Navbar />
+            
             <main style={{ marginLeft: '260px', flex: 1, padding: '40px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
                     <div>
@@ -134,10 +135,32 @@ const ManageOrders = () => {
                                                         <p style={{ fontSize: '14px', fontWeight: '700', color: '#1e293b' }}>
                                                             {order.transportStatus?.replace(/_/g, ' ') || 'BOOKED'}
                                                         </p>
-                                                        <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>
-                                                            Handled by Transport Service Hub
-                                                        </p>
+                                                        <button 
+                                                            onClick={() => navigate(`/messages?userId=${order.buyerId}`)}
+                                                            className="btn" 
+                                                            style={{ 
+                                                                width: '100%', marginTop: '10px', padding: '6px', 
+                                                                background: 'white', border: '1px solid var(--primary)', 
+                                                                fontSize: '12px', fontWeight: '600', color: 'var(--primary)' 
+                                                            }}
+                                                        >
+                                                            Chat with Buyer
+                                                        </button>
                                                     </div>
+                                                )}
+                                                {!order.hasTransport && (
+                                                    <button 
+                                                        onClick={() => navigate(`/messages?userId=${order.buyerId}`)}
+                                                        className="btn" 
+                                                        style={{ 
+                                                            marginBottom: '10px', padding: '10px', 
+                                                            background: 'white', border: '1px solid var(--border)', 
+                                                            fontSize: '13px', fontWeight: '600', color: 'var(--text-main)',
+                                                            display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                                        }}
+                                                    >
+                                                        <MessageCircle size={14} style={{ marginRight: '8px' }} /> Chat with Buyer
+                                                    </button>
                                                 )}
                                                 <div style={{ marginTop: '10px' }}>
                                                     <p style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase', marginBottom: '8px' }}>Shipping Address</p>

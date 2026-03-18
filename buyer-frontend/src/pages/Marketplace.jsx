@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/api';
 import { Search, Filter, Star, MapPin, ShoppingCart, MessageCircle } from 'lucide-react';
-import Navbar from '../components/Navbar';
 import { useCart as useCartState } from '../context/CartContext';
 import NegotiationModal from '../components/NegotiationModal';
 
@@ -71,7 +70,7 @@ const Marketplace = () => {
 
     return (
         <div style={{ minHeight: '100vh', backgroundColor: '#f8fafc' }}>
-            <Navbar />
+            
 
             <main className="container" style={{ paddingBottom: '60px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>

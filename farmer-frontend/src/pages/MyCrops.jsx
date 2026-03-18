@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ShoppingBag, Edit2, Trash2, Plus, Star, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '../components/Navbar';
 import api from '../api/api';
 
 const MyCrops = () => {
@@ -41,7 +40,7 @@ const MyCrops = () => {
 
     return (
         <div style={{ display: 'flex' }}>
-            <Navbar />
+            
             <main style={{ marginLeft: '260px', flex: 1, padding: '40px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
                     <div>

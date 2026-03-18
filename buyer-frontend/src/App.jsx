@@ -11,6 +11,9 @@ import Orders from './pages/Orders';
 import Negotiations from './pages/Negotiations';
 import MyTransport from './pages/MyTransport';
 import Payments from './pages/Payments';
+import Messages from './pages/Messages';
+import Reviews from './pages/Reviews';
+import OrderTracking from './pages/OrderTracking';
 
 const PrivateRoute = ({ children }) => {
     const { user, loading } = useAuth();
@@ -71,6 +74,14 @@ function App() {
                 }
             />
             <Route
+                path="/track/:orderId"
+                element={
+                    <PrivateRoute>
+                        <OrderTracking />
+                    </PrivateRoute>
+                }
+            />
+            <Route
                 path="/negotiations"
                 element={
                     <PrivateRoute>
@@ -99,6 +110,22 @@ function App() {
                 element={
                     <PrivateRoute>
                         <Payments />
+                    </PrivateRoute>
+                }
+            />
+            <Route
+                path="/messages"
+                element={
+                    <PrivateRoute>
+                        <Messages />
+                    </PrivateRoute>
+                }
+            />
+            <Route
+                path="/reviews"
+                element={
+                    <PrivateRoute>
+                        <Reviews />
                     </PrivateRoute>
                 }
             />

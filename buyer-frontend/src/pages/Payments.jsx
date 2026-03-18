@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { RefreshCcw, HandCoins, Package, Truck, Search } from 'lucide-react';
-import Navbar from '../components/Navbar';
 import api from '../api/api';
 
 const Payments = () => {
@@ -41,7 +40,7 @@ const Payments = () => {
 
     return (
         <div style={{ minHeight: '100vh', background: '#f8fafc' }}>
-            <Navbar />
+            
             <main className="container" style={{ padding: '32px 0' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
                     <div>

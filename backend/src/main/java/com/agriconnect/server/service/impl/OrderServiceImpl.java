@@ -239,6 +239,7 @@ public class OrderServiceImpl implements OrderService {
                         .id(item.getId())
                         .cropId(item.getCrop().getId())
                         .cropName(item.getCrop().getName())
+                        .farmerId(item.getCrop().getFarmer().getId())
                         .farmerName(item.getCrop().getFarmer().getFullName())
                         .farmerLocation(item.getCrop().getLocation() != null ? item.getCrop().getLocation()
                                 : item.getCrop().getFarmer().getAddress())

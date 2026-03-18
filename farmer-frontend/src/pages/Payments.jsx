@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { RefreshCcw, HandCoins } from 'lucide-react';
-import Navbar from '../components/Navbar';
 import api from '../api/api';
 
 const Payments = () => {
@@ -34,7 +33,7 @@ const Payments = () => {
 
     return (
         <div style={{ display: 'flex' }}>
-            <Navbar />
+            
             <main style={{ marginLeft: '260px', flex: 1, padding: '40px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
                     <div>

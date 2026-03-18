@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { MessageSquare, Check, X, Clock, RefreshCcw } from 'lucide-react';
-import Navbar from '../components/Navbar';
 import api from '../api/api';
 import { useCart } from '../context/CartContext';
 
@@ -58,7 +57,7 @@ const Negotiations = () => {
 
     return (
         <div style={{ minHeight: '100vh' }}>
-            <Navbar />
+            
             <div className="container">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
                     <h1 style={{ fontSize: '28px', fontWeight: '700' }}>My Price Offers</h1>

@@ -4,7 +4,6 @@ import {
     Search, Filter, Clock, CheckCircle, XCircle, ArrowRight,
     Navigation, DollarSign, Weight, ChevronDown, ChevronUp, RefreshCw
 } from 'lucide-react';
-import Navbar from '../components/Navbar';
 import api from '../api/api';
 
 /* ── Status config ──────────────────────────────────────────────────── */
@@ -207,7 +206,7 @@ const MyTransport = () => {
 
     return (
         <div style={{ minHeight: '100vh', background: '#f8fafc' }}>
-            <Navbar />
+            
             <div className="container" style={{ paddingTop: 32, paddingBottom: 48 }}>
 
                 {/* ── Page Header ── */}
