@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { ShoppingBag, MessageSquare, TrendingUp, Plus, ArrowUpRight } from 'lucide-react';
+import { ShoppingBag, MessageSquare, TrendingUp, Plus, ArrowUpRight, MessageCircle, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/api';
 
@@ -22,7 +22,7 @@ const FarmerDashboard = () => {
 
                 if (cropsRes.data.success && negRes.data.success) {
                     const activeCrops = cropsRes.data.data.totalElements || 0;
-                    const pendingNegs = negRes.data.data.content?.filter(n => n.status === 'PENDING').length || 0;
+                    const pendingNegs = negRes.data.data?.content?.filter(n => n.status === 'PENDING').length || 0;
 
                     setStats([
                         { label: 'Active Listings', value: activeCrops.toString(), icon: ShoppingBag, color: '#3b82f6' },

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import {
     Package, Truck, CheckCircle, Clock, XCircle, Search,
-    MapPin, User, Phone, Car, Calendar, ChevronDown, ChevronUp, MessageCircle
+    MapPin, User, Phone, Car, Calendar, ChevronDown, ChevronUp, MessageCircle, Star
 } from 'lucide-react';
 import TransportBookingModal from '../components/TransportBookingModal';
 import api from '../api/api';
