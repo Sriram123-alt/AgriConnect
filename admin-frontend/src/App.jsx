@@ -8,6 +8,8 @@ import ManageUsers from './pages/ManageUsers';
 import ManageAllCrops from './pages/ManageAllCrops';
 import ManageAllOrders from './pages/ManageAllOrders';
 
+import MainLayout from './components/MainLayout';
+
 const PrivateRoute = ({ children }) => {
     const { user, loading } = useAuth();
 
@@ -17,7 +19,7 @@ const PrivateRoute = ({ children }) => {
         </div>
     );
 
-    return user ? children : <Navigate to="/login" />;
+    return user ? <MainLayout>{children}</MainLayout> : <Navigate to="/login" />;
 };
 
 function App() {

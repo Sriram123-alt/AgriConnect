@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Users, ShoppingBag, Package, TrendingUp, AlertCircle, ArrowUp, ArrowDown } from 'lucide-react';
-import AdminNavbar from '../components/AdminNavbar';
 import api from '../api/api';
 
 const AdminDashboard = () => {
@@ -41,10 +40,8 @@ const AdminDashboard = () => {
     ];
 
     return (
-        <div style={{ display: 'flex', background: '#f1f5f9', minHeight: '100vh' }}>
-            <AdminNavbar />
-            <main style={{ marginLeft: '280px', flex: 1, padding: '40px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+        <>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
                     <div>
                         <h1 style={{ fontSize: '28px', fontWeight: '800', color: '#1e293b' }}>Platform Overview</h1>
                         <p style={{ color: '#64748b' }}>Here's what's happening globally across AgriConnect.</p>
@@ -121,8 +118,7 @@ const AdminDashboard = () => {
                         </div>
                     </div>
                 </div>
-            </main>
-        </div>
+        </>
     );
 };
 
