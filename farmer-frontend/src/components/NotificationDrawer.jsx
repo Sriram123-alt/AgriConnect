@@ -87,7 +87,13 @@ const NotificationDrawer = ({ isOpen, onClose, setExternalUnreadCount }) => {
     const handleNotificationClick = (n) => {
         if (!n.isRead) markAsRead(n.id);
         if (n.link) {
-            navigate(n.link);
+            let route = n.link;
+            if (route.startsWith('/manage-orders')) {
+                route = route.replace('/manage-orders', '/orders');
+            } else if (route.startsWith('/track/')) {
+                route = route.replace('/track/', '/orders/');
+            }
+            navigate(route);
             onClose();
         }
     };
