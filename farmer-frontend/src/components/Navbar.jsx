@@ -142,33 +142,26 @@ const Navbar = () => {
             </div>
 
             <div style={{ paddingTop: '20px', borderTop: '1px solid var(--border)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px', padding: '0 8px' }}>
-                    <div style={{ width: '40px', height: '40px', background: 'var(--primary-light)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div 
+                    onClick={handleLogout}
+                    title="Click to Logout"
+                    style={{ 
+                        display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 8px', 
+                        cursor: 'pointer', borderRadius: '12px', transition: 'background 0.2s',
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.background = '#fee2e2'; e.currentTarget.querySelector('.logout-text').style.color = '#dc2626' }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.querySelector('.logout-text').style.color = 'var(--text-muted)' }}
+                >
+                    <div style={{ width: '40px', height: '40px', background: 'var(--primary-light)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                         <span style={{ fontWeight: '700', color: 'var(--primary-dark)' }}>{user?.fullName?.[0]}</span>
                     </div>
-                    <div style={{ overflow: 'hidden' }}>
-                        <p style={{ fontWeight: '700', fontSize: '14px', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{user?.fullName}</p>
-                        <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Farmer</p>
+                    <div style={{ overflow: 'hidden', flex: 1 }}>
+                        <p style={{ fontWeight: '700', fontSize: '14px', whiteSpace: 'nowrap', textOverflow: 'ellipsis', color: 'var(--text-main)', margin: 0 }}>{user?.fullName}</p>
+                        <p className="logout-text" style={{ fontSize: '12px', color: 'var(--text-muted)', margin: 0, display: 'flex', alignItems: 'center', gap: '4px', transition: 'color 0.2s' }}>
+                            Farmer <LogOut size={12} />
+                        </p>
                     </div>
                 </div>
-                <button
-                    onClick={handleLogout}
-                    style={{
-                        width: '100%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '12px',
-                        padding: '12px 16px',
-                        borderRadius: '12px',
-                        border: 'none',
-                        background: 'transparent',
-                        cursor: 'pointer',
-                        color: 'var(--error)',
-                        fontWeight: '600'
-                    }}
-                >
-                    <LogOut size={20} /> Logout
-                </button>
             </div>
             <NotificationDrawer
                 isOpen={isNotifOpen}
