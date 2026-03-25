@@ -2,6 +2,7 @@ package com.agriconnect.server.controller;
 
 import com.agriconnect.server.dto.ApiResponse;
 import com.agriconnect.server.dto.OrderDTO;
+import com.agriconnect.server.dto.UnifiedCheckoutRequest;
 import com.agriconnect.server.entity.Order;
 import com.agriconnect.server.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,14 @@ public class OrderController {
 
     @Autowired
     private OrderService orderService;
+
+    @PostMapping("/checkout/unified")
+    @PreAuthorize("hasRole('BUYER')")
+    public ResponseEntity<ApiResponse<OrderDTO>> processUnifiedCheckout(@RequestBody UnifiedCheckoutRequest request,
+            Authentication authentication) {
+        OrderDTO result = orderService.processUnifiedCheckout(request, authentication.getName());
+        return ResponseEntity.ok(ApiResponse.success(result, "Order and transport confirmed!"));
+    }
 
     @PostMapping
     @PreAuthorize("hasRole('BUYER')")
@@ -83,9 +92,20 @@ public class OrderController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Page<OrderDTO>>> getAllOrders(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "50") int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<OrderDTO> result = orderService.getAllOrders(pageable);
         return ResponseEntity.ok(ApiResponse.success(result, "All orders fetched successfully!"));
+    }
+
+    @PostMapping("/{id}/pay-unified")
+    @PreAuthorize("hasRole('BUYER')")
+    public ResponseEntity<ApiResponse<OrderDTO>> payUnified(
+            @PathVariable Long id,
+            @RequestParam String transactionId,
+            @RequestParam Order.PaymentMethod method,
+            Authentication authentication) {
+        OrderDTO result = orderService.processUnifiedPayment(id, transactionId, method, authentication.getName());
+        return ResponseEntity.ok(ApiResponse.success(result, "Payment successful!"));
     }
 }

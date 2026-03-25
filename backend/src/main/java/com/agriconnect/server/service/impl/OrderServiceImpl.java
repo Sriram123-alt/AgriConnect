@@ -1,6 +1,7 @@
 package com.agriconnect.server.service.impl;
 
 import com.agriconnect.server.dto.OrderDTO;
+import com.agriconnect.server.dto.UnifiedCheckoutRequest;
 import com.agriconnect.server.entity.*;
 import com.agriconnect.server.repository.*;
 import com.agriconnect.server.service.OrderService;
@@ -50,10 +51,9 @@ public class OrderServiceImpl implements OrderService {
                 .shippingAddress(orderDTO.getShippingAddress())
                 .paymentMethod(orderDTO.getPaymentMethod())
                 .paymentTransactionId(orderDTO.getPaymentTransactionId())
-                .status(orderDTO.getPaymentMethod() == Order.PaymentMethod.COD ? Order.OrderStatus.PENDING
-                        : Order.OrderStatus.PAID)
-                .paymentStatus(orderDTO.getPaymentMethod() == Order.PaymentMethod.COD ? Order.PaymentStatus.PENDING
-                        : Order.PaymentStatus.PAID)
+                .status(Order.OrderStatus.PENDING)
+                .paymentStatus(Order.PaymentStatus.PENDING)
+                .transportFee(BigDecimal.ZERO)
                 .items(new ArrayList<>())
                 .build();
 
@@ -204,28 +204,134 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<OrderDTO> getBuyerOrders(String email, Pageable pageable) {
         User buyer = userRepository.findByEmail(email).orElseThrow();
-        return orderRepository.findByBuyer(buyer, pageable).map(this::mapToDTO);
+        return orderRepository.findByBuyerOrderByIdDesc(buyer, pageable).map(this::mapToDTO);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<OrderDTO> getFarmerOrders(String email, Pageable pageable) {
         User farmer = userRepository.findByEmail(email).orElseThrow();
-        return orderRepository.findByFarmer(farmer, pageable).map(this::mapToDTO);
+        return orderRepository.findByFarmerOrderByIdDesc(farmer, pageable).map(this::mapToDTO);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<OrderDTO> getAllOrders(Pageable pageable) {
-        return orderRepository.findAll(pageable).map(this::mapToDTO);
+        return orderRepository.findAllByOrderByIdDesc(pageable).map(this::mapToDTO);
+    }
+
+    @Override
+    @Transactional
+    public OrderDTO processUnifiedPayment(Long orderId, String transactionId, Order.PaymentMethod method, String email) {
+        Order order = orderRepository.findById(orderId).orElseThrow();
+        User user = userRepository.findByEmail(email).orElseThrow();
+
+        if (!order.getBuyer().getId().equals(user.getId())) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        order.setPaymentStatus(Order.PaymentStatus.PAID);
+        order.setFarmerPaymentStatus(Order.PaymentStatus.PENDING); 
+        order.setTransportPaymentStatus(Order.PaymentStatus.PENDING);
+        order.setStatus(Order.OrderStatus.CONFIRMED);
+        order.setPaymentTransactionId(transactionId);
+        order.setPaymentMethod(method);
+
+        Order saved = orderRepository.save(order);
+
+        notificationService.createNotification(
+                order.getBuyer(),
+                "Payment Successful",
+                String.format("Unified payment for Order #%d (Crops + Transport) was successful.", order.getId()),
+                "ORDER",
+                "/orders");
+
+        return mapToDTO(saved);
+    }
+
+    @Override
+    @Transactional
+    public OrderDTO processUnifiedCheckout(UnifiedCheckoutRequest request, String email) {
+        // 1. Place the order
+        OrderDTO orderDTO = placeOrder(request.getOrderDetails(), email);
+        Order order = orderRepository.findById(orderDTO.getId()).orElseThrow();
+
+        // 2. Create the transport booking
+        double totalWeightKg = order.getItems().stream().mapToDouble(i -> i.getQuantity()).sum();
+        BigDecimal estimatedCost = calculateTransportCost(request.getVehicleType(), totalWeightKg);
+
+        TransportBooking booking = TransportBooking.builder()
+                .order(order)
+                .vehicleType(request.getVehicleType())
+                .pickupAddress(resolvePickupAddress(order))
+                .deliveryAddress(order.getShippingAddress())
+                .totalWeightKg(totalWeightKg)
+                .estimatedCost(estimatedCost)
+                .status(TransportBooking.BookingStatus.BOOKED)
+                .build();
+
+        transportBookingRepository.save(booking);
+
+        // 3. Complete payment status: platform received money from buyer
+        order.setPaymentStatus(Order.PaymentStatus.PAID);
+        order.setFarmerPaymentStatus(Order.PaymentStatus.PENDING); // Admin will pay them
+        order.setTransportPaymentStatus(Order.PaymentStatus.PENDING); // Admin will pay them
+        order.setStatus(Order.OrderStatus.CONFIRMED);
+        order.setPaymentTransactionId(request.getTransactionId());
+        order.setTransportFee(estimatedCost);
+        order.setPaymentMethod(Order.PaymentMethod.UPI); // Default for unified
+
+        Order saved = orderRepository.save(order);
+
+        notificationService.createNotification(
+                order.getBuyer(),
+                "Order & Transport Confirmed",
+                String.format("Payment successful for Order #%d. Total weight: %.1f kg.", order.getId(), totalWeightKg),
+                "ORDER",
+                "/orders/" + order.getId());
+
+        return mapToDTO(saved);
+    }
+
+    private BigDecimal calculateTransportCost(TransportBooking.VehicleType vehicleType, double weightKg) {
+        double tons = Math.max(weightKg / 1000.0, 0.5);
+        double cost = vehicleType.getBaseCostPerTon() * tons;
+        cost += 250; // flat fee
+        return BigDecimal.valueOf(cost).setScale(2, java.math.RoundingMode.HALF_UP);
+    }
+
+    private String resolvePickupAddress(Order order) {
+        if (!order.getItems().isEmpty()) {
+            Crop firstCrop = order.getItems().get(0).getCrop();
+            if (firstCrop.getLocation() != null && !firstCrop.getLocation().isBlank()) {
+                return firstCrop.getLocation();
+            }
+            User farmer = firstCrop.getFarmer();
+            if (farmer.getAddress() != null && !farmer.getAddress().isBlank()) {
+                return farmer.getAddress();
+            }
+        }
+        return "Farmer's location";
     }
 
     private OrderDTO mapToDTO(Order order) {
+        BigDecimal subtotal = order.getItems().stream()
+                .map(item -> item.getPriceAtPurchase().multiply(BigDecimal.valueOf(item.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal earnings = subtotal.multiply(BigDecimal.valueOf(1 - COMMISSION_PERCENTAGE / 100));
+
+        // Fetch transport info once to avoid multiple DB hits
+        TransportBooking transport = transportBookingRepository.findByOrderId(order.getId()).orElse(null);
+
         return OrderDTO.builder()
                 .id(order.getId())
                 .buyerId(order.getBuyer().getId())
                 .buyerName(order.getBuyer().getFullName())
                 .totalAmount(order.getTotalAmount())
+                .farmerEarnings(earnings.setScale(2, java.math.RoundingMode.HALF_UP))
                 .status(order.getStatus())
                 .shippingAddress(order.getShippingAddress())
                 .paymentTransactionId(order.getPaymentTransactionId())
@@ -234,6 +340,7 @@ public class OrderServiceImpl implements OrderService {
                 .transportPaymentStatus(order.getTransportPaymentStatus())
                 .paymentMethod(order.getPaymentMethod())
                 .createdAt(order.getCreatedAt())
+                .transportFee(order.getTransportFee() != null ? order.getTransportFee() : BigDecimal.ZERO)
                 .totalWeightKg(order.getItems().stream().mapToDouble(i -> i.getQuantity()).sum())
                 .items(order.getItems().stream().map(item -> OrderDTO.OrderItemDTO.builder()
                         .id(item.getId())
@@ -246,15 +353,9 @@ public class OrderServiceImpl implements OrderService {
                         .priceAtPurchase(item.getPriceAtPurchase())
                         .quantity(item.getQuantity())
                         .build()).collect(Collectors.toList()))
-                .hasTransport(transportBookingRepository.findByOrderId(order.getId())
-                        .map(t -> t.getStatus() != TransportBooking.BookingStatus.CANCELLED)
-                        .orElse(false))
-                .transportId(transportBookingRepository.findByOrderId(order.getId())
-                        .map(t -> t.getId())
-                        .orElse(null))
-                .transportStatus(transportBookingRepository.findByOrderId(order.getId())
-                        .map(t -> t.getStatus().name())
-                        .orElse(null))
+                .hasTransport(transport != null && transport.getStatus() != TransportBooking.BookingStatus.CANCELLED)
+                .transportId(transport != null ? transport.getId() : null)
+                .transportStatus(transport != null ? transport.getStatus().name() : null)
                 .build();
     }
 }

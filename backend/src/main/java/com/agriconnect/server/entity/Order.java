@@ -52,6 +52,9 @@ public class Order extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
 
+    @Builder.Default
+    private BigDecimal transportFee = BigDecimal.ZERO;
+
     public enum OrderStatus {
         PENDING,
         PAID,

@@ -10,8 +10,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
-    Page<Order> findByBuyer(User buyer, Pageable pageable);
+    Page<Order> findByBuyerOrderByIdDesc(User buyer, Pageable pageable);
 
-    @Query("SELECT DISTINCT o FROM Order o JOIN o.items i WHERE i.crop.farmer = :farmer")
-    Page<Order> findByFarmer(@Param("farmer") User farmer, Pageable pageable);
+    @Query("SELECT DISTINCT o FROM Order o JOIN o.items i WHERE i.crop.farmer = :farmer ORDER BY o.id DESC")
+    Page<Order> findByFarmerOrderByIdDesc(@Param("farmer") User farmer, Pageable pageable);
+
+    Page<Order> findAllByOrderByIdDesc(Pageable pageable);
 }

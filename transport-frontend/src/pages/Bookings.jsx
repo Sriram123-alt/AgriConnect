@@ -256,6 +256,10 @@ const Bookings = () => {
                                                 </span>
                                                 <span style={{ color: '#475569', fontSize: 13 }}>·</span>
                                                 <span style={{ fontSize: 13, color: '#94a3b8' }}>
+                                                    {new Date(b.createdAt).toLocaleDateString()}
+                                                </span>
+                                                <span style={{ color: '#475569', fontSize: 13 }}>·</span>
+                                                <span style={{ fontSize: 13, color: '#94a3b8' }}>
                                                     {b.vehicleType?.replace(/_/g, ' ')}
                                                 </span>
                                             </div>
@@ -370,6 +374,10 @@ const Bookings = () => {
                                                 }}>
                                                     <p style={{ fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', marginBottom: 10 }}>Shipment Details</p>
                                                     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
+                                                            <span style={{ color: '#94a3b8' }}>Booking Date</span>
+                                                            <span style={{ fontWeight: 600 }}>{new Date(b.createdAt).toLocaleString()}</span>
+                                                        </div>
                                                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
                                                             <span style={{ color: '#94a3b8' }}>Order ID</span>
                                                             <span style={{ fontWeight: 600 }}>#{b.orderId || '—'}</span>

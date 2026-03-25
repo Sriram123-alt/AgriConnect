@@ -27,4 +27,5 @@ public class CropDTO {
     private String farmerName;
     private List<String> imageUrls;
     private Double averageRating;
+    private Double farmerRating;
 }

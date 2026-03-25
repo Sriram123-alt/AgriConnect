@@ -160,12 +160,18 @@ const CropDetails = () => {
                             </div>
                             <div style={{ padding: '8px 12px', background: '#fef3c7', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                                 <Star size={16} color="#d97706" fill="#d97706" />
-                                <span style={{ fontWeight: '700', color: '#92400e' }}>{crop.averageRating?.toFixed(1) || '4.5'}</span>
+                                <span style={{ fontWeight: '700', color: '#92400e' }}>{(crop.averageRating > 0 ? crop.averageRating : 0).toFixed(1)}</span>
                             </div>
                         </div>
 
-                        <p style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-muted)', fontSize: '15px', marginBottom: '24px' }}>
-                            <MapPin size={16} /> Sold by <span style={{ fontWeight: '700', color: 'var(--text-main)' }}>{crop.farmerName}</span> • {crop.location || "Maharashtra, India"}
+                        <p style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px', color: 'var(--text-muted)', fontSize: '15px', marginBottom: '24px' }}>
+                            <MapPin size={16} /> Sold by <span style={{ fontWeight: '700', color: 'var(--text-main)' }}>{crop.farmerName}</span> 
+                            {crop.farmerRating > 0 && (
+                                <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#f59e0b', fontSize: '13px', fontWeight: '800', background: '#fef3c7', padding: '2px 8px', borderRadius: '6px' }}>
+                                    <Star size={12} fill="#f59e0b" /> {crop.farmerRating.toFixed(1)} Farmer Rating
+                                </span>
+                            )}
+                            • {crop.location || "Maharashtra, India"}
                         </p>
 
                         <div style={{ padding: '20px', background: '#f8fafc', borderRadius: '16px', marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -249,7 +255,7 @@ const CropDetails = () => {
                             </div>
                             <div>
                                 <p style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: '600' }}>Farmer Profile</p>
-                                <p style={{ fontWeight: '700' }}>{crop.farmerName}</p>
+                                <p style={{ fontWeight: '700' }}>{crop.farmerName} {crop.farmerRating > 0 && <span style={{color: '#f59e0b', fontSize: '12px'}}>★ {crop.farmerRating.toFixed(1)}</span>}</p>
                             </div>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--primary)', fontWeight: '600', fontSize: '13px' }}>

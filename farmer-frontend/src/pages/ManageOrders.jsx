@@ -127,7 +127,7 @@ const ManageOrders = () => {
                                             {order.status === 'SHIPPED' && !order.hasTransport && (
                                                 <button onClick={() => handleUpdateStatus(order.id, 'DELIVERED')} className="btn btn-primary" style={{ background: 'var(--success)' }}>Mark Delivered</button>
                                             )}
-                                            {order.status === 'DELIVERED' && (
+                                            {order.status !== 'PENDING' && order.status !== 'CANCELLED' && (
                                                 <button 
                                                     onClick={() => setReviewingOrder(order)} 
                                                     className="btn btn-secondary" 
@@ -176,6 +176,7 @@ const ManageOrders = () => {
                                                     <MessageCircle size={14} style={{ marginRight: '8px' }} /> Chat with Buyer
                                                 </button>
                                             )}
+
                                             <div style={{ marginTop: '10px' }}>
                                                 <p style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase', marginBottom: '8px' }}>Shipping Address</p>
                                                 <p style={{ fontSize: '14px', background: '#f1f5f9', padding: '12px', borderRadius: '8px' }}>{order.shippingAddress}</p>

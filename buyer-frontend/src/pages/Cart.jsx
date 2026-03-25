@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShoppingCart, Trash2, ArrowLeft, CreditCard, MapPin, Home, Building2, Navigation } from 'lucide-react';
+import { ShoppingCart, Trash2, ArrowLeft, CreditCard, MapPin, Home, Building2, Navigation, Truck } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import PaymentModal from '../components/PaymentModal';
@@ -64,6 +64,40 @@ const Cart = () => {
     const [addr, setAddr] = useState(emptyAddress);
     const [errors, setErrors] = useState({});
     const [showPaymentModal, setShowPaymentModal] = useState(false);
+    const [vehicleOptions, setVehicleOptions] = useState([]);
+    const [selectedVehicle, setSelectedVehicle] = useState(null);
+    const [transportFee, setTransportFee] = useState(0);
+
+    // Calculate total weight to recommend vehicles
+    const cartTotalWeight = cartItems.reduce((acc, item) => acc + (item.quantity || 0), 0);
+
+    React.useEffect(() => {
+        if (cartItems.length > 0) {
+            fetchVehicleOptions();
+        }
+    }, [cartTotalWeight]);
+
+    const fetchVehicleOptions = async () => {
+        try {
+            const res = await api.get(`/api/transport/vehicle-options?weightKg=${cartTotalWeight}`);
+            if (res.data.success) {
+                setVehicleOptions(res.data.data);
+                // Auto-select recommended
+                const rec = res.data.data.find(v => v.recommended === 'YES') || res.data.data[0];
+                if (rec) handleVehicleSelect(rec);
+            }
+        } catch (err) {
+            console.error('Failed to fetch vehicle options', err);
+        }
+    };
+
+    const handleVehicleSelect = (vehicle) => {
+        setSelectedVehicle(vehicle);
+        // Cost calculation logic inside frontend (simplified to match backend logic)
+        const tons = Math.max(cartTotalWeight / 1000.0, 0.5);
+        const fee = (vehicle.baseCostPerTon * tons) + 250;
+        setTransportFee(fee);
+    };
 
     const handleAddrChange = (field, value) => {
         setAddr(prev => ({ ...prev, [field]: value }));
@@ -97,6 +131,7 @@ const Cart = () => {
     const handleCheckout = () => {
         const errs = validate();
         if (Object.keys(errs).length > 0) { setErrors(errs); return; }
+        if (!selectedVehicle) { alert('Please select a transport vehicle'); return; }
         setShowPaymentModal(true);
     };
 
@@ -104,33 +139,27 @@ const Cart = () => {
         setShowPaymentModal(false);
         setLoading(true);
         try {
-            const orderData = {
-                shippingAddress: buildAddressString(),
-                paymentMethod: paymentInfo.method,
-                paymentTransactionId: paymentInfo.transactionId,
-                items: cartItems.map(item => ({
-                    cropId: item.id,
-                    quantity: item.quantity,
-                    negotiationId: item.negotiationId
-                }))
+            const checkoutData = {
+                orderDetails: {
+                    shippingAddress: buildAddressString(),
+                    items: cartItems.map(item => ({
+                        cropId: item.id,
+                        quantity: item.quantity,
+                        negotiationId: item.negotiationId
+                    }))
+                },
+                vehicleType: selectedVehicle.type,
+                transactionId: paymentInfo.transactionId
             };
 
-            const response = await api.post('/api/orders', orderData);
+            const response = await api.post('/api/orders/checkout/unified', checkoutData);
             if (response.data.success) {
                 clearCart();
-                const wantsTransport = window.confirm(
-                    '✅ Order placed successfully!\n\n' +
-                    '🚛 Would you like to book transport now?\n\n' +
-                    'A lorry/truck will pick up the crops from the farmer\'s location and deliver to your address.'
-                );
-                if (wantsTransport) {
-                    navigate('/orders', { state: { bookTransportForOrder: response.data.data } });
-                } else {
-                    navigate('/orders');
-                }
+                alert('✅ Order & Transport booked successfully in one payment!');
+                navigate('/orders');
             }
         } catch (err) {
-            alert(err.response?.data?.message || 'Failed to place order');
+            alert(err.response?.data?.message || 'Checkout failed');
         } finally {
             setLoading(false);
         }
@@ -184,7 +213,22 @@ const Cart = () => {
                             </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: '#f1f5f9', padding: '4px', borderRadius: '8px' }}>
                                 <button onClick={() => updateQuantity(item.id, item.quantity - 1)} style={{ border: 'none', background: 'white', width: '28px', height: '28px', borderRadius: '6px', cursor: 'pointer', fontWeight: '700' }}>-</button>
-                                <span style={{ minWidth: '20px', textAlign: 'center', fontWeight: '600' }}>{item.quantity}</span>
+                                <input 
+                                    type="number" 
+                                    min="1"
+                                    value={item.quantity}
+                                    onChange={(e) => updateQuantity(item.id, parseInt(e.target.value) || 1)}
+                                    style={{ 
+                                        width: '40px', 
+                                        textAlign: 'center', 
+                                        fontWeight: '600', 
+                                        border: 'none', 
+                                        background: 'transparent',
+                                        outline: 'none',
+                                        appearance: 'none',
+                                        margin: 0
+                                    }}
+                                />
                                 <button onClick={() => updateQuantity(item.id, item.quantity + 1)} style={{ border: 'none', background: 'white', width: '28px', height: '28px', borderRadius: '6px', cursor: 'pointer', fontWeight: '700' }}>+</button>
                             </div>
                             <div style={{ minWidth: '80px', textAlign: 'right' }}>
@@ -203,15 +247,66 @@ const Cart = () => {
                     {/* Order Summary */}
                     <div className="card" style={{ padding: '24px' }}>
                         <h2 style={{ fontSize: '20px', fontWeight: '700', marginBottom: '20px' }}>Order Summary</h2>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', color: 'var(--text-muted)' }}>
-                            <span>Subtotal</span><span>₹{cartTotal.toFixed(2)}</span>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10, color: 'var(--text-muted)', fontSize: 14 }}>
+                            <span>Crops Subtotal</span><span>₹{cartTotal.toFixed(2)}</span>
                         </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', color: 'var(--text-muted)' }}>
-                            <span>Shipping</span><span style={{ color: 'var(--success)', fontWeight: '600' }}>FREE</span>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10, color: 'var(--text-muted)', fontSize: 14 }}>
+                            <span>Transport Fee ({selectedVehicle?.label || 'Calculating...'})</span>
+                            <span>₹{transportFee.toFixed(2)}</span>
                         </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '14px', paddingTop: '14px', borderTop: '1px solid var(--border)', fontSize: '18px', fontWeight: '700' }}>
-                            <span>Total</span>
-                            <span style={{ color: 'var(--primary)' }}>₹{cartTotal.toFixed(2)}</span>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10, color: 'var(--text-muted)', fontSize: 14 }}>
+                            <span>Total Weight</span><span>{cartTotalWeight.toFixed(1)} kg</span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 14, paddingTop: 14, borderTop: '1px solid var(--border)', fontSize: '20px', fontWeight: '800' }}>
+                            <span>Total Payable</span>
+                            <span style={{ color: 'var(--primary)' }}>₹{(cartTotal + transportFee).toFixed(2)}</span>
+                        </div>
+                    </div>
+
+                    {/* Transport Selection */}
+                    <div className="card" style={{ padding: '24px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+                            <div style={{ background: '#eff6ff', borderRadius: '8px', padding: '6px' }}>
+                                <Truck size={18} color="#2563eb" />
+                            </div>
+                            <h2 style={{ fontSize: '18px', fontWeight: '700' }}>Transport Options</h2>
+                        </div>
+                        <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '16px' }}>
+                            Select a vehicle for delivery from farmer's location to your address.
+                        </p>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                            {vehicleOptions.map(option => (
+                                <div 
+                                    key={option.type}
+                                    onClick={() => handleVehicleSelect(option)}
+                                    style={{
+                                        padding: '12px',
+                                        borderRadius: '10px',
+                                        border: `2px solid ${selectedVehicle?.type === option.type ? '#2563eb' : '#e2e8f0'}`,
+                                        background: selectedVehicle?.type === option.type ? '#f0f7ff' : '#fff',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s',
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center'
+                                    }}
+                                >
+                                    <div>
+                                        <p style={{ fontWeight: 700, fontSize: 14, color: selectedVehicle?.type === option.type ? '#1e40af' : '#1e293b' }}>
+                                            {option.label}
+                                            {option.recommended === 'YES' && <span style={{ marginLeft: 8, fontSize: 10, background: '#dcfce7', color: '#166534', padding: '2px 6px', borderRadius: 4 }}>RECOMMENDED</span>}
+                                        </p>
+                                        <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>Max: {option.maxWeightKg}kg • ₹{option.baseCostPerTon}/ton</p>
+                                    </div>
+                                    <div style={{ 
+                                        width: 18, height: 18, borderRadius: '50%', 
+                                        border: `2px solid ${selectedVehicle?.type === option.type ? '#2563eb' : '#cbd5e1'}`,
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                    }}>
+                                        {selectedVehicle?.type === option.type && <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#2563eb' }} />}
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     </div>
 
@@ -352,9 +447,10 @@ const Cart = () => {
 
             {showPaymentModal && (
                 <PaymentModal
-                    amount={cartTotal}
+                    amount={cartTotal + transportFee}
                     onPaymentSuccess={handlePaymentSuccess}
                     onClose={() => setShowPaymentModal(false)}
+                    description="Order Items + Transport Fee"
                 />
             )}
         </div>

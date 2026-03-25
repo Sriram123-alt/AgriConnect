@@ -25,11 +25,11 @@ const Payments = () => {
 
     const totalEarned = orders
         .filter(o => o.farmerPaymentStatus === 'PAID')
-        .reduce((sum, o) => sum + o.items.reduce((itemSum, i) => itemSum + (i.quantity * i.priceAtPurchase), 0), 0);
+        .reduce((sum, o) => sum + (o.farmerEarnings || 0), 0);
 
     const pendingAmount = orders
         .filter(o => o.farmerPaymentStatus !== 'PAID')
-        .reduce((sum, o) => sum + o.items.reduce((itemSum, i) => itemSum + (i.quantity * i.priceAtPurchase), 0), 0);
+        .reduce((sum, o) => sum + (o.farmerEarnings || 0), 0);
 
     return (
         <div className="animate-fade-in">
@@ -51,11 +51,11 @@ const Payments = () => {
                 <>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '32px' }}>
                         <div className="card" style={{ padding: '24px', borderLeft: '4px solid #10b981' }}>
-                            <p style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase', marginBottom: '8px' }}>Total Payouts Received</p>
+                            <p style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase', marginBottom: '8px' }}>Total Payouts Received (Net)</p>
                             <p style={{ fontSize: '32px', fontWeight: '800', color: '#10b981' }}>₹{totalEarned.toFixed(2)}</p>
                         </div>
                         <div className="card" style={{ padding: '24px', borderLeft: '4px solid #f59e0b' }}>
-                            <p style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase', marginBottom: '8px' }}>Pending Platform Payments</p>
+                            <p style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase', marginBottom: '8px' }}>Pending Payouts (Net)</p>
                             <p style={{ fontSize: '32px', fontWeight: '800', color: '#f59e0b' }}>₹{pendingAmount.toFixed(2)}</p>
                         </div>
                     </div>
@@ -76,28 +76,26 @@ const Payments = () => {
                                     <thead style={{ background: '#f8fafc', borderBottom: '1px solid var(--border)' }}>
                                         <tr>
                                             <th style={{ padding: '16px', fontSize: '12px', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Order Details</th>
-                                            <th style={{ padding: '16px', fontSize: '12px', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Items List</th>
-                                            <th style={{ padding: '16px', fontSize: '12px', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Order Cost</th>
-                                            <th style={{ padding: '16px', fontSize: '12px', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Payout Status</th>
+                                            <th style={{ padding: '16px', fontSize: '12px', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Gross Amount</th>
+                                            <th style={{ padding: '16px', fontSize: '12px', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Fee (5%)</th>
+                                            <th style={{ padding: '16px', fontSize: '12px', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Net Payout</th>
+                                            <th style={{ padding: '16px', fontSize: '12px', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Status</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {orders.map(order => {
-                                            const orderAmount = order.items.reduce((sum, item) => sum + (item.quantity * item.priceAtPurchase), 0);
+                                            const earnings = order.farmerEarnings || 0;
+                                            const grossAmount = earnings / 0.95;
+                                            const fee = grossAmount * 0.05;
                                             return (
                                                 <tr key={order.id} style={{ borderBottom: '1px solid var(--border)' }}>
                                                     <td style={{ padding: '16px' }}>
-                                                        <p style={{ fontWeight: '700', marginBottom: '4px' }}>#{order.id}</p>
+                                                        <p style={{ fontWeight: '700', marginBottom: '4px' }}>Order #{order.id}</p>
                                                         <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{new Date(order.createdAt).toLocaleDateString()}</p>
                                                     </td>
-                                                    <td style={{ padding: '16px' }}>
-                                                        {order.items.map(item => (
-                                                            <div key={item.id} style={{ fontSize: '13px', color: '#475569', marginBottom: '2px' }}>
-                                                                {item.quantity}kg x {item.cropName}
-                                                            </div>
-                                                        ))}
-                                                    </td>
-                                                    <td style={{ padding: '16px', fontWeight: '700' }}>₹{orderAmount.toFixed(2)}</td>
+                                                    <td style={{ padding: '16px' }}>₹{grossAmount.toFixed(2)}</td>
+                                                    <td style={{ padding: '16px', color: '#dc2626' }}>-₹{fee.toFixed(2)}</td>
+                                                    <td style={{ padding: '16px', fontWeight: '800', color: 'var(--primary)' }}>₹{earnings.toFixed(2)}</td>
                                                     <td style={{ padding: '16px' }}>
                                                         <span style={{ fontSize: '12px', fontWeight: '700', padding: '6px 12px', borderRadius: '100px', background: order.farmerPaymentStatus === 'PAID' ? '#dcfce7' : '#fef3c7', color: order.farmerPaymentStatus === 'PAID' ? '#15803d' : '#92400e' }}>
                                                             {order.farmerPaymentStatus || 'PENDING'}

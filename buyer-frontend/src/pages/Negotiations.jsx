@@ -94,12 +94,6 @@ const Negotiations = () => {
                                     <div style={{ padding: '6px 12px', borderRadius: '100px', fontSize: '12px', fontWeight: '700', ...getStatusStyle(neg.status) }}>
                                         {neg.status}
                                     </div>
-                                    <button 
-                                        onClick={() => navigate(`/messages?userId=${neg.farmerId}`)}
-                                        style={{ background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', fontWeight: '700' }}
-                                    >
-                                        <MessageSquare size={14} /> Chat
-                                    </button>
                                 </div>
                             </div>
 
@@ -145,7 +139,7 @@ const Negotiations = () => {
                                 </div>
                             )}
 
-                            <div style={{ display: 'flex', gap: '12px' }}>
+                            <div style={{ display: 'flex', gap: '12px', marginBottom: '12px' }}>
                                 {neg.status === 'ACCEPTED' ? (
                                     <button
                                         onClick={() => {
@@ -156,7 +150,7 @@ const Negotiations = () => {
                                         className="btn btn-primary"
                                         style={{ flex: 1 }}
                                     >
-                                        Add to Cart with this price
+                                        <Check size={16} /> Add to Cart
                                     </button>
                                 ) : neg.status === 'COUNTERED' ? (
                                     <>
@@ -165,14 +159,14 @@ const Negotiations = () => {
                                             className="btn btn-primary"
                                             style={{ flex: 1, background: '#6b21a8' }}
                                         >
-                                            Accept Counter
+                                            <Check size={16} /> Accept Counter
                                         </button>
                                         <button
                                             onClick={() => handleUpdateStatus(neg.id, 'REJECTED')}
                                             className="btn"
                                             style={{ background: '#fee2e2', color: '#991b1b', flex: 1 }}
                                         >
-                                            Decline
+                                            <X size={16} /> Decline
                                         </button>
                                     </>
                                 ) : neg.status === 'REJECTED' ? (
@@ -185,6 +179,14 @@ const Negotiations = () => {
                                     </button>
                                 )}
                             </div>
+
+                            <button 
+                                onClick={() => navigate(`/messages?userId=${neg.farmerId}`)}
+                                className="btn" 
+                                style={{ width: '100%', border: '1px solid var(--primary)', background: 'white', color: 'var(--primary)' }}
+                            >
+                                <MessageSquare size={18} /> Chat with Farmer
+                            </button>
                         </div>
                     ))}
                 </div>

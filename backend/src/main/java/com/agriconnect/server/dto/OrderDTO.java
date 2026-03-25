@@ -31,6 +31,8 @@ public class OrderDTO {
     private Long transportId;
     private String transportStatus;
     private Double totalWeightKg;
+    private BigDecimal transportFee;
+    private BigDecimal farmerEarnings; // Net amount for the farmer after platform fee
     private LocalDateTime createdAt;
 
     @Data

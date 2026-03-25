@@ -10,6 +10,7 @@ const Marketplace = () => {
     const [crops, setCrops] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const navigate = useNavigate();
     const { addToCart } = useCartState();
     const [selectedCrop, setSelectedCrop] = useState(null);
     const [isNegotiating, setIsNegotiating] = useState(false);
@@ -42,7 +43,8 @@ const Marketplace = () => {
                     unit: crop.unit || 'kg',
                     farmer: crop.farmerName || 'Unknown Farmer',
                     farmerEmail: crop.farmerEmail,
-                    rating: crop.averageRating || 4.5,
+                    rating: crop.averageRating || 0,
+                    farmerRating: crop.farmerRating || 0,
                     imageUrl: crop.imageUrls && crop.imageUrls.length > 0
                         ? crop.imageUrls[0]
                         : getPlaceholder(crop.name),
@@ -137,9 +139,11 @@ const Marketplace = () => {
                             style={{ height: '220px', width: '100%', position: 'relative', cursor: 'pointer' }}
                         >
                             <img src={crop.imageUrl} alt={crop.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                            <div style={{ position: 'absolute', top: '12px', right: '12px', background: 'rgba(255,255,255,0.95)', padding: '6px 10px', borderRadius: '100px', fontSize: '12px', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '4px', boxShadow: 'var(--shadow)' }}>
-                                <Star size={14} color="#f59e0b" fill="#f59e0b" /> {crop.rating.toFixed(1)}
-                            </div>
+                            {crop.rating > 0 && (
+                                <div style={{ position: 'absolute', top: '12px', right: '12px', background: 'rgba(255,255,255,0.95)', padding: '6px 10px', borderRadius: '100px', fontSize: '12px', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '4px', boxShadow: 'var(--shadow)' }}>
+                                    <Star size={14} color="#f59e0b" fill="#f59e0b" /> {crop.rating.toFixed(1)}
+                                </div>
+                            )}
                         </div>
                         <div style={{ padding: '24px' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '8px' }}>
@@ -151,8 +155,16 @@ const Marketplace = () => {
                                 </h3>
                                 <span style={{ fontSize: '20px', fontWeight: '800', color: 'var(--primary)' }}>₹{crop.price.toFixed(2)}<span style={{ fontSize: '14px', fontWeight: '500', color: 'var(--text-muted)' }}>/kg</span></span>
                             </div>
-                            <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                <MapPin size={14} /> {crop.farmer} • {crop.location}
+                            <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginBottom: '8px', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '6px' }}>
+                                <MapPin size={14} /> 
+                                <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{crop.farmer}</span>
+                                {crop.farmerRating > 0 && (
+                                    <span style={{ display: 'flex', alignItems: 'center', gap: '2px', color: '#f59e0b', fontSize: '12px', fontWeight: '700', background: '#fef3c7', padding: '1px 6px', borderRadius: '4px' }}>
+                                        <Star size={10} fill="#f59e0b" /> {crop.farmerRating.toFixed(1)}
+                                    </span>
+                                )}
+                                <span style={{ color: 'var(--border)' }}>•</span>
+                                <span>{crop.location}</span>
                             </p>
                             <div style={{ marginBottom: '16px', fontSize: '14px', fontWeight: '600', color: 'var(--primary-dark)' }}>
                                 Available: {crop.quantity} {crop.unit || 'kg'}

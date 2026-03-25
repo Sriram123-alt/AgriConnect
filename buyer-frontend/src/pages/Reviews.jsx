@@ -15,13 +15,6 @@ const Reviews = () => {
 
     useEffect(() => {
         fetchData();
-        
-        const params = new URLSearchParams(window.location.search);
-        const oId = params.get('orderId');
-        if (oId) {
-            setShowReviewForm(parseInt(oId));
-            setTab('pending');
-        }
     }, []);
 
     const fetchData = async () => {
@@ -30,10 +23,32 @@ const Reviews = () => {
                 api.get('/api/reviews/my?size=50'),
                 api.get('/api/orders/buyer/me?size=50')
             ]);
-            if (reviewsRes.data.success) setMyReviews(reviewsRes.data.data.content || []);
+            
+            let reviews = [];
+            if (reviewsRes.data.success) {
+                reviews = reviewsRes.data.data.content || [];
+                setMyReviews(reviews);
+            }
+
             if (ordersRes.data.success) {
-                const delivered = (ordersRes.data.data.content || []).filter(o => o.status === 'DELIVERED');
-                setDeliveredOrders(delivered);
+                const eligible = (ordersRes.data.data.content || []).filter(o => o.status !== 'PENDING' && o.status !== 'CANCELLED');
+                setDeliveredOrders(eligible);
+                
+                // Auto-open first item if orderId is in URL
+                const params = new URLSearchParams(window.location.search);
+                const oId = params.get('orderId');
+                if (oId) {
+                    const targetOrder = eligible.find(o => o.id === parseInt(oId));
+                    if (targetOrder && targetOrder.items?.length > 0) {
+                        const firstItem = targetOrder.items[0];
+                        // Only open if not already reviewed
+                        const alreadyReviewed = reviews.some(r => r.orderId === targetOrder.id && r.cropId === firstItem.cropId);
+                        if (!alreadyReviewed) {
+                            setShowReviewForm(`${targetOrder.id}-${firstItem.id}`);
+                            setTab('pending');
+                        }
+                    }
+                }
             }
         } catch (e) { console.error(e); }
         finally { setLoading(false); }
@@ -69,8 +84,15 @@ const Reviews = () => {
         finally { setSubmitting(false); }
     };
 
-    const reviewedOrderIds = myReviews.map(r => r.orderId);
-    const pendingOrders = deliveredOrders.filter(o => !reviewedOrderIds.includes(o.id));
+    // Helper to check if an item is already reviewed
+    const isItemReviewed = (orderId, cropId) => {
+        return myReviews.some(r => r.orderId === orderId && r.cropId === cropId);
+    };
+
+    // An order is pending if it has at least one item not yet reviewed
+    const pendingOrders = deliveredOrders.filter(order => 
+        order.items?.some(item => !isItemReviewed(order.id, item.cropId))
+    );
 
     const StarRating = ({ value, onHover, onClick, interactive = true, size = 22 }) => (
         <div style={{ display: 'flex', gap: 2 }}>
@@ -139,61 +161,83 @@ const Reviews = () => {
                             </span>
                         </div>
 
-                        {order.items?.map(item => (
-                            <div key={item.id} style={{
-                                fontSize: 13, color: 'var(--text-muted)', marginLeft: 30,
-                                marginBottom: 4
-                            }}>
-                                🌾 {item.cropName} — {item.quantity} kg by {item.farmerName}
-                            </div>
-                        ))}
+                        {order.items?.map(item => {
+                            const isAlreadyReviewed = isItemReviewed(order.id, item.cropId);
+                            const isReviewingThis = showReviewForm === `${order.id}-${item.id}`;
 
-                        {showReviewForm === order.id ? (
-                            <div style={{
-                                marginTop: 16, padding: 20, background: '#f9fafb',
-                                borderRadius: 12, border: '1px solid var(--border)'
-                            }}>
-                                <div style={{ marginBottom: 16 }}>
-                                    <label style={{ fontWeight: 600, fontSize: 14, marginBottom: 8, display: 'block' }}>
-                                        How was your experience?
-                                    </label>
-                                    <StarRating value={rating} onHover={setHoverRating} onClick={setRating} size={32} />
+                            return (
+                                <div key={item.id} style={{
+                                    margin: '12px 0 12px 30px', padding: '12px', background: '#f8fafc',
+                                    borderRadius: 10, border: '1px solid #e2e8f0'
+                                }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <div style={{ fontSize: 13, color: 'var(--text-main)', fontWeight: 600 }}>
+                                            🌾 {item.cropName} — {item.quantity} kg by {item.farmerName}
+                                        </div>
+                                        {!isAlreadyReviewed && !isReviewingThis && (
+                                            <button onClick={() => {
+                                                setShowReviewForm(`${order.id}-${item.id}`);
+                                                setRating(0);
+                                                setComment('');
+                                            }} style={{
+                                                padding: '4px 12px', background: 'var(--primary)',
+                                                color: 'white', border: 'none', borderRadius: 6,
+                                                fontWeight: 600, cursor: 'pointer', fontSize: 12
+                                            }}>Review</button>
+                                        )}
+                                        {isAlreadyReviewed && (
+                                            <span style={{ fontSize: 11, color: '#059669', fontWeight: 600 }}>Already Reviewed</span>
+                                        )}
+                                    </div>
+
+                                    {isReviewingThis && (
+                                        <div style={{
+                                            marginTop: 12, padding: 12, background: 'white',
+                                            borderRadius: 8, border: '1px solid var(--border)'
+                                        }}>
+                                            <div style={{ marginBottom: 12 }}>
+                                                <StarRating value={rating} onHover={setHoverRating} onClick={setRating} size={24} />
+                                            </div>
+                                            <textarea value={comment} onChange={e => setComment(e.target.value)}
+                                                placeholder={`How was the ${item.cropName}?`}
+                                                rows={2} style={{
+                                                    width: '100%', padding: '8px 12px', borderRadius: 8,
+                                                    border: '1px solid var(--border)', fontSize: 13,
+                                                    resize: 'vertical', outline: 'none', fontFamily: 'inherit', marginBottom: 10
+                                                }} />
+                                            <div style={{ display: 'flex', gap: 8 }}>
+                                                <button onClick={() => {
+                                                    if (rating === 0) return alert('Please select a rating');
+                                                    setSubmitting(true);
+                                                    api.post('/api/reviews', {
+                                                        orderId: order.id,
+                                                        revieweeId: item.farmerId,
+                                                        cropId: item.cropId,
+                                                        rating: rating,
+                                                        comment: comment
+                                                    }).then(res => {
+                                                        if (res.data.success) {
+                                                            setShowReviewForm(null);
+                                                            fetchData();
+                                                        }
+                                                    }).catch(e => {
+                                                        alert(e.response?.data?.message || 'Failed to submit review');
+                                                    }).finally(() => setSubmitting(false));
+                                                }} disabled={submitting} style={{
+                                                    padding: '6px 16px', background: 'var(--primary)', color: 'white',
+                                                    border: 'none', borderRadius: 8, fontWeight: 600, cursor: 'pointer',
+                                                    fontSize: 12, opacity: submitting ? 0.6 : 1
+                                                }}>Submit</button>
+                                                <button onClick={() => setShowReviewForm(null)} style={{
+                                                    padding: '6px 16px', background: 'transparent', color: 'var(--text-muted)',
+                                                    border: '1px solid var(--border)', borderRadius: 8, fontWeight: 600, cursor: 'pointer', fontSize: 12
+                                                }}>Cancel</button>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
-                                <div style={{ marginBottom: 16 }}>
-                                    <label style={{ fontWeight: 600, fontSize: 14, marginBottom: 8, display: 'block' }}>
-                                        Your Comment (optional)
-                                    </label>
-                                    <textarea value={comment} onChange={e => setComment(e.target.value)}
-                                        placeholder="Share your thoughts about the quality, freshness, packaging..."
-                                        rows={3} style={{
-                                            width: '100%', padding: '10px 14px', borderRadius: 10,
-                                            border: '1px solid var(--border)', fontSize: 14,
-                                            resize: 'vertical', outline: 'none', fontFamily: 'inherit'
-                                        }} />
-                                </div>
-                                <div style={{ display: 'flex', gap: 10 }}>
-                                    <button onClick={() => submitReview(order)} disabled={submitting} style={{
-                                        padding: '10px 24px', background: 'var(--primary)', color: 'white',
-                                        border: 'none', borderRadius: 10, fontWeight: 600, cursor: 'pointer',
-                                        opacity: submitting ? 0.6 : 1
-                                    }}>
-                                        {submitting ? 'Submitting...' : 'Submit Review'}
-                                    </button>
-                                    <button onClick={() => { setShowReviewForm(null); setRating(0); setComment(''); }} style={{
-                                        padding: '10px 24px', background: 'transparent', color: 'var(--text-muted)',
-                                        border: '1px solid var(--border)', borderRadius: 10, fontWeight: 600, cursor: 'pointer'
-                                    }}>Cancel</button>
-                                </div>
-                            </div>
-                        ) : (
-                            <button onClick={() => setShowReviewForm(order.id)} style={{
-                                marginTop: 12, padding: '8px 20px', background: 'var(--primary)',
-                                color: 'white', border: 'none', borderRadius: 10, fontWeight: 600,
-                                cursor: 'pointer', fontSize: 13, display: 'flex', alignItems: 'center', gap: 6
-                            }}>
-                                <Star size={14} /> Write Review
-                            </button>
-                        )}
+                            );
+                        })}
                     </div>
                 ))
             ) : (
@@ -216,7 +260,7 @@ const Reviews = () => {
                                     }}>
                                         <User size={16} color="var(--primary-dark)" />
                                     </div>
-                                    <span style={{ fontWeight: 600, fontSize: 14 }}>{review.revieweeName}</span>
+                                    <span style={{ fontWeight: 600, fontSize: 14 }}>Farmer: {review.revieweeName}</span>
                                     {review.cropName && (
                                         <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
                                             — {review.cropName}

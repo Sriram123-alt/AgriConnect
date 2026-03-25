@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { MessageSquare, Check, X, Clock, RefreshCcw, User } from 'lucide-react';
 import api from '../api/api';
 
@@ -70,6 +71,7 @@ const CounterOfferModal = ({ negotiation, onClose, onSuccess }) => {
 };
 
 const ManageNegotiations = () => {
+    const navigate = useNavigate();
     const [negotiations, setNegotiations] = useState([]);
     const [loading, setLoading] = useState(true);
     const [counterModal, setCounterModal] = useState(null);

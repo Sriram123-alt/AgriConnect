@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import {
-    Package, Truck, CheckCircle, Clock, XCircle, Search,
+    Package, Truck, CheckCircle, Clock, XCircle, Search, CreditCard,
     MapPin, User, Phone, Car, Calendar, ChevronDown, ChevronUp, MessageCircle, Star
 } from 'lucide-react';
 import TransportBookingModal from '../components/TransportBookingModal';
+import PaymentModal from '../components/PaymentModal';
 import api from '../api/api';
 
 const STATUS_CONFIG = {
@@ -31,6 +32,7 @@ const Orders = () => {
     const [expandedOrder, setExpandedOrder] = useState(null);
     const [transportBookings, setTransportBookings] = useState({}); // orderId → booking
     const [bookingModal, setBookingModal] = useState(null); // order object or null
+    const [showPaymentModal, setShowPaymentModal] = useState(null); // order object or null
     const location = useLocation();
     const navigate = useNavigate();
     const { orderId } = useParams();
@@ -54,14 +56,19 @@ const Orders = () => {
                     setExpandedOrder(parseInt(orderId));
                 }
 
-                // Auto-open transport booking modal if coming from Cart
+                // Auto-open transport booking modal if coming from Cart (Old workflow)
                 if (location.state?.bookTransportForOrder) {
                     const newOrder = location.state.bookTransportForOrder;
                     const matchingOrder = fetched.find(o => o.id === newOrder.id) || newOrder;
-                    setExpandedOrder(matchingOrder.id);
-                    setBookingModal(matchingOrder);
-                    // Clear the state so refreshing doesn't re-trigger
-                    window.history.replaceState({}, document.title);
+                    
+                    // SAFETY: Only open if it doesn't already have transport
+                    if (!matchingOrder.hasTransport) {
+                        setExpandedOrder(matchingOrder.id);
+                        setBookingModal(matchingOrder);
+                    }
+                    
+                    // Clear the state properly using react-router
+                    navigate(location.pathname, { replace: true, state: {} });
                 }
             }
         } catch (err) {
@@ -88,6 +95,29 @@ const Orders = () => {
 
     const handleBooked = (booking) => {
         setTransportBookings(prev => ({ ...prev, [booking.orderId]: booking }));
+        // Refresh orders to get updated transport fees
+        fetchOrders();
+    };
+
+    const handleUnifiedPaymentSuccess = async (paymentInfo) => {
+        const order = showPaymentModal;
+        if (!order) return;
+        
+        try {
+            const res = await api.post(`/api/orders/${order.id}/pay-unified`, null, {
+                params: {
+                    transactionId: paymentInfo.transactionId,
+                    method: paymentInfo.method
+                }
+            });
+            if (res.data.success) {
+                alert('Combined payment for crops and transport successful!');
+                setShowPaymentModal(null);
+                fetchOrders();
+            }
+        } catch (err) {
+            alert(err.response?.data?.message || 'Payment failed');
+        }
     };
 
     const filtered = orders.filter(o =>
@@ -175,7 +205,7 @@ const Orders = () => {
                                             <MetaBlock label="Pay Status" value={order.paymentStatus || 'PENDING'} bold color={order.paymentStatus === 'PAID' ? '#16a34a' : '#f59e0b'} />
                                             <MetaBlock label="Items" value={`${order.items?.length || 0} item(s)`} />
                                         </div>
-                                            {order.status === 'DELIVERED' && (
+                                            {order.status !== 'PENDING' && order.status !== 'CANCELLED' && (
                                                 <button
                                                     onClick={() => navigate(`/reviews?orderId=${order.id}`)}
                                                     style={{
@@ -234,7 +264,7 @@ const Orders = () => {
                                             >
                                                 {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                                             </button>
-                                    </div>
+                                        </div>
 
                                     {/* Collapsible Details */}
                                     {isExpanded && (
@@ -297,7 +327,7 @@ const Orders = () => {
                                                         </div>
                                                         <span style={{ fontWeight: 700, fontSize: 15 }}>Transport</span>
                                                     </div>
-                                                    {canBookTransport && (
+                                                    {canBookTransport && !order.hasTransport && (
                                                         <button
                                                             onClick={() => setBookingModal(order)}
                                                             className="btn btn-primary"
@@ -351,7 +381,7 @@ const Orders = () => {
                                             </span>
                                         </div>
                                     )}
-                                    {!isExpanded && !transport && order.status !== 'CANCELLED' && (
+                                    {!isExpanded && !transport && !order.hasTransport && order.status !== 'CANCELLED' && (
                                         <div style={{ padding: '8px 24px', background: '#fffbeb', display: 'flex', alignItems: 'center', gap: 6 }}>
                                             <Truck size={13} color="#d97706" />
                                             <span style={{ fontSize: 12, fontWeight: 700, color: '#d97706' }}>Transport not yet booked</span>
@@ -374,6 +404,16 @@ const Orders = () => {
                     order={bookingModal}
                     onClose={() => setBookingModal(null)}
                     onBooked={handleBooked}
+                />
+            )}
+            
+            {/* Unified Payment Modal */}
+            {showPaymentModal && (
+                <PaymentModal
+                    amount={Number(showPaymentModal.totalAmount) + Number(showPaymentModal.transportFee || 0)}
+                    onPaymentSuccess={handleUnifiedPaymentSuccess}
+                    onClose={() => setShowPaymentModal(null)}
+                    description={`Combined payment for items and transport (Order #${showPaymentModal.id})`}
                 />
             )}
         </div>

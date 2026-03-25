@@ -31,5 +31,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     Page<Review> findByCropIdOrderByCreatedAtDesc(Long cropId, Pageable pageable);
 
+    @Query("SELECT AVG(r.rating) FROM Review r WHERE r.crop.id = :cropId")
+    Double getAverageRatingForCrop(@Param("cropId") Long cropId);
+
     boolean existsByOrderIdAndReviewerId(Long orderId, Long reviewerId);
 }

@@ -25,6 +25,9 @@ public class CropServiceImpl implements CropService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private com.agriconnect.server.repository.ReviewRepository reviewRepository;
+
     @Override
     @Transactional
     public CropDTO createCrop(CropDTO cropDTO, String email) {
@@ -106,12 +109,14 @@ public class CropServiceImpl implements CropService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<CropDTO> getFarmerCrops(String email, Pageable pageable) {
         User farmer = userRepository.findByEmail(email).orElseThrow();
         return cropRepository.findByFarmer(farmer, pageable).map(this::mapToDTO);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<CropDTO> searchCrops(String name, Boolean organic, BigDecimal minPrice, BigDecimal maxPrice,
             Pageable pageable) {
         String namePattern = (name != null && !name.isEmpty()) ? "%" + name + "%" : null;
@@ -119,6 +124,7 @@ public class CropServiceImpl implements CropService {
     }
 
     private CropDTO mapToDTO(Crop crop) {
+        Double farmerAvg = reviewRepository.getAverageRatingForUser(crop.getFarmer().getId());
         return CropDTO.builder()
                 .id(crop.getId())
                 .name(crop.getName())
@@ -132,6 +138,7 @@ public class CropServiceImpl implements CropService {
                 .farmerId(crop.getFarmer().getId())
                 .farmerName(crop.getFarmer().getFullName())
                 .averageRating(crop.getAverageRating())
+                .farmerRating(farmerAvg != null ? Math.round(farmerAvg * 10.0) / 10.0 : 0.0)
                 .imageUrls(crop.getImages().stream().map(CropImage::getImageUrl).collect(Collectors.toList()))
                 .build();
     }

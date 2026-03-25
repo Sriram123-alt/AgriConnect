@@ -47,9 +47,9 @@ public class ReviewServiceImpl implements ReviewService {
         Order order = orderRepository.findById(reviewDTO.getOrderId()).orElseThrow(
                 () -> new RuntimeException("Order not found"));
 
-        // Only allow reviews for DELIVERED orders
-        if (order.getStatus() != Order.OrderStatus.DELIVERED) {
-            throw new RuntimeException("You can only review delivered orders.");
+        // Allow reviews for any status except PENDING and CANCELLED
+        if (order.getStatus() == Order.OrderStatus.PENDING || order.getStatus() == Order.OrderStatus.CANCELLED) {
+            throw new RuntimeException("Orders can be reviewed once they are paid.");
         }
 
         User reviewee = userRepository.findById(reviewDTO.getRevieweeId()).orElseThrow(
@@ -86,6 +86,15 @@ public class ReviewServiceImpl implements ReviewService {
                 .build();
 
         Review saved = reviewRepository.save(review);
+
+        // Update Crop's average rating if applicable
+        if (crop != null) {
+            Double avg = reviewRepository.getAverageRatingForCrop(crop.getId());
+            if (avg != null) {
+                crop.setAverageRating(Math.round(avg * 10.0) / 10.0);
+                cropRepository.save(crop);
+            }
+        }
 
         // Send notification to reviewee
         notificationService.createNotification(

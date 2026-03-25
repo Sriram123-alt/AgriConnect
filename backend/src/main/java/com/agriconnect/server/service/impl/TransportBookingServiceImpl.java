@@ -82,6 +82,10 @@ public class TransportBookingServiceImpl implements TransportBookingService {
 
         TransportBooking saved = transportBookingRepository.save(booking);
 
+        // Update Order with transport fee
+        order.setTransportFee(estimatedCost);
+        orderRepository.save(order);
+
         // Notify Farmer
         notificationService.createNotification(
                 order.getItems().get(0).getCrop().getFarmer(),
@@ -108,18 +112,21 @@ public class TransportBookingServiceImpl implements TransportBookingService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<TransportBookingDTO> getBuyerBookings(String email, Pageable pageable) {
         User buyer = userRepository.findByEmail(email).orElseThrow();
         return transportBookingRepository.findByBuyer(buyer, pageable).map(this::mapToDTO);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<TransportBookingDTO> getFarmerBookings(String email, Pageable pageable) {
         User farmer = userRepository.findByEmail(email).orElseThrow();
         return transportBookingRepository.findByFarmer(farmer, pageable).map(this::mapToDTO);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<TransportBookingDTO> getAllBookings(Pageable pageable) {
         return transportBookingRepository.findAll(pageable).map(this::mapToDTO);
     }
