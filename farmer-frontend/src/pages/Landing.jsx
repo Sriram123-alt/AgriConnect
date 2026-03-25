@@ -1,8 +1,17 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { Leaf, DollarSign, TrendingUp, ArrowRight, ShieldCheck, PieChart, Users } from 'lucide-react';
 
 const Landing = () => {
+    const { user, logout } = useAuth();
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        logout();
+        navigate('/');
+    };
+
     return (
         <div style={{ minHeight: '100vh', backgroundColor: 'white', color: 'var(--text-main)' }}>
             {/* Navbar */}
@@ -14,8 +23,15 @@ const Landing = () => {
                         </div>
                         <span style={{ fontSize: '24px', fontWeight: '800', letterSpacing: '-0.5px' }}>AgriFarmer</span>
                     </div>
-                    <div style={{ display: 'flex', gap: '32px', alignItems: 'center' }}>
-                        <Link to="/login" className="btn btn-primary" style={{ padding: '10px 24px' }}>Farmer Login</Link>
+                    <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                        {user ? (
+                            <>
+                                <Link to="/dashboard" className="btn btn-primary" style={{ padding: '10px 24px' }}>Dashboard</Link>
+                                <button onClick={handleLogout} className="btn btn-secondary" style={{ padding: '10px 24px', background: 'white', border: '1px solid var(--border)' }}>Logout</button>
+                            </>
+                        ) : (
+                            <Link to="/login" className="btn btn-primary" style={{ padding: '10px 24px' }}>Farmer Login</Link>
+                        )}
                     </div>
                 </div>
             </nav>
